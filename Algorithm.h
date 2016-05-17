@@ -99,6 +99,11 @@ InputIterator find_if(InputIterator first, InputIterator last, UnaryPredicate pr
 	return first;
 }
 
+void f()
+{
+	int i;
+}
+
 //--------------------------------【find_if_not() function】----------------------------------
 
 template <typename InputIterator, typename UnaryPredicate>
