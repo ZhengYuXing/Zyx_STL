@@ -18,7 +18,7 @@ const T& max(const T& a, const T& b)
 template <typename T>
 const T& min(const T& a, const T& b)
 {
-	return b < a ? b : a;
+    return b < a ? b : a;
 }
 
 //--------------------------------【max_elements() function】---------------------------------
@@ -26,27 +26,27 @@ const T& min(const T& a, const T& b)
 template <typename ForwardIterator>
 ForwardIterator max_element(ForwardIterator first, ForwardIterator last)
 {
-	if (first == last)
-		return last;
+    if (first == last)
+        return last;
 
-	ForwardIterator largest = first;
-	while (++first != last) 
-		if (*largest < *first)
-			largest = first;
-	return largest;
+    ForwardIterator largest = first;
+    while (++first != last) 
+        if (*largest < *first)
+            largest = first;
+    return largest;
 }
 
 template <typename ForwardIterator, typename Compare>
 ForwardIterator max_element(ForwardIterator first, ForwardIterator last, Compare comp)
 {
-	if (first == last)
-		return last;
+    if (first == last)
+        return last;
 
-	ForwardIterator largest = first;
-	while (++first != last)
-		if (comp(*largest, *first))
-			largest = first;
-	return largest;
+    ForwardIterator largest = first;
+    while (++first != last)
+        if (comp(*largest, *first))
+            largest = first;
+    return largest;
 }
 
 //--------------------------------【min_elements() function】---------------------------------
@@ -54,27 +54,27 @@ ForwardIterator max_element(ForwardIterator first, ForwardIterator last, Compare
 template <typename ForwardIterator>
 ForwardIterator min_element(ForwardIterator first, ForwardIterator last)
 {
-	if (first == last)
-		return last;
+    if (first == last)
+        return last;
 
-	ForwardIterator smallest = first;
-	while (++first != last) 
-		if (*first < *smallest)
-			smallest = first;
-	return smallest;
+    ForwardIterator smallest = first;
+    while (++first != last) 
+        if (*first < *smallest)
+            smallest = first;
+    return smallest;
 }
 
 template <typename ForwardIterator, typename Compare>
 ForwardIterator min_element(ForwardIterator first, ForwardIterator last, Compare comp)
 {
-	if (first == last)
-		return last;
+    if (first == last)
+        return last;
 
-	ForwardIterator smallest = first;
-	while (++first != last)
-		if (comp(*first, *smallest))
-			smallest = first;
-	return smallest;
+    ForwardIterator smallest = first;
+    while (++first != last)
+        if (comp(*first, *smallest))
+            smallest = first;
+    return smallest;
 }
 
 //-------------------------------------【find() function】------------------------------------
@@ -82,7 +82,7 @@ ForwardIterator min_element(ForwardIterator first, ForwardIterator last, Compare
 template <typename InputIterator, typename T>
 InputIterator find(InputIterator first, InputIterator last, const T& val)
 {
-	while (first != last && !(*first == val)) {
+    while (first != last && !(*first == val)) {
 		++first;
 	}
 	return first;
