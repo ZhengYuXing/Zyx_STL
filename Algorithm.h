@@ -83,9 +83,9 @@ template <typename InputIterator, typename T>
 InputIterator find(InputIterator first, InputIterator last, const T& val)
 {
     while (first != last && !(*first == val)) {
-		++first;
-	}
-	return first;
+        ++first;
+    }
+    return first;
 }
 
 //----------------------------------【find_if() function】------------------------------------
@@ -93,15 +93,10 @@ InputIterator find(InputIterator first, InputIterator last, const T& val)
 template <typename InputIterator, typename UnaryPredicate>
 InputIterator find_if(InputIterator first, InputIterator last, UnaryPredicate pred)
 {
-	while (first != last && !pred(*first)) {
-		++first;
-	}
-	return first;
-}
-
-void f()
-{
-	int i;
+    while (first != last && !pred(*first)) {
+        ++first;
+    }
+    return first;
 }
 
 //--------------------------------【find_if_not() function】----------------------------------
@@ -109,96 +104,96 @@ void f()
 template <typename InputIterator, typename UnaryPredicate>
 InputIterator find_if_not(InputIterator first, InputIterator last, UnaryPredicate pred)
 {
-	while (first != last && pred(*first)) {
-		++first;
-	}
-	return first;
+    while (first != last && pred(*first)) {
+        ++first;
+    }
+    return first;
 }
 
 //------------------------------【find_first_of() function】----------------------------------
 
 template <typename InputIterator, typename ForwardIterator>
 InputIterator find_first_of(InputIterator first1, InputIterator last1,
-							ForwardIterator first2, ForwardIterator last2)
+                            ForwardIterator first2, ForwardIterator last2)
 {
-	while (first1 != last1) {
-		for (ForwardIterator iter = first2; iter != last2; ++iter)
-			if (*iter == *first1) 
-				return first1;
-		++first1;
-	}
-	return last1;
+    while (first1 != last1) {
+        for (ForwardIterator iter = first2; iter != last2; ++iter)
+            if (*iter == *first1) 
+                return first1;
+        ++first1;
+    }
+    return last1;
 }
 
 template <typename InputIterator, typename ForwardIterator, typename BinaryPredicate>
 InputIterator find_first_of(InputIterator first1, InputIterator last1,
-							ForwardIterator first2, ForwardIterator last2, 
-							BinaryPredicate pred)
+                            ForwardIterator first2, ForwardIterator last2, 
+                            BinaryPredicate pred)
 {
-	while (first1 != last1) {
-		for (ForwardIterator iter = first2; iter != last2; ++iter)
-			if (pred(*iter, *first1))
-				return first1;
-		++first1;
-	}
-	return last1;
+    while (first1 != last1) {
+        for (ForwardIterator iter = first2; iter != last2; ++iter)
+            if (pred(*iter, *first1))
+                return first1;
+            ++first1;
+    }    
+    return last1;
 }
 
 //---------------------------------【find_end() function】------------------------------------
 
 template <typename ForwardIterator1, typename ForwardIterator2>
 ForwardIterator1 find_end(ForwardIterator1 first1, ForwardIterator1 last1,
-						  ForwardIterator2 first2, ForwardIterator2 last2)
+                          ForwardIterator2 first2, ForwardIterator2 last2)
 {
-	if (first2 == last2)
-		return last1;
+    if (first2 == last2)
+        return last1;
 
-	ForwardIterator1 result = last1;
-	while (first1 != last1) {
-		ForwardIterator1 iter1 = first1;
-		ForwardIterator2 iter2 = first2;
-		while (*iter1 == *iter2) {
-			++iter1;
-			++iter2;
-			if (iter2 == last2) {
-				result = first1;
-				break;
-			}
-			if (iter1 == last1) {
-				return result;
-			}
-		}
-		++first1;
-	}
-	return result;
+    ForwardIterator1 result = last1;
+    while (first1 != last1) {
+        ForwardIterator1 iter1 = first1;
+        ForwardIterator2 iter2 = first2;
+        while (*iter1 == *iter2) {
+            ++iter1;
+            ++iter2;
+            if (iter2 == last2) {
+                result = first1;
+                break;
+            }
+            if (iter1 == last1) {
+                return result;                
+            }
+        }
+        ++first1;
+    }
+    return result;
 }
 
 template <typename ForwardIterator1, typename ForwardIterator2, typename BinaryPredicate>
 ForwardIterator1 find_end(ForwardIterator1 first1, ForwardIterator1 last1,
-						  ForwardIterator2 first2, ForwardIterator2 last2,
-						  BinaryPredicate pred)
+                          ForwardIterator2 first2, ForwardIterator2 last2,
+                          BinaryPredicate pred)
 {
-	if (first2 == last2)
-		return last1;
+    if (first2 == last2)
+        return last1;
 
-	ForwardIterator1 result = last1;
-	while (first1 != last1) {
-		ForwardIterator1 iter1 = first1;
-		ForwardIterator2 iter2 = first2;
-		while (pred(*iter1, *iter2)) {
-			++iter1;
-			++iter2;
-			if (iter2 == last2) {
-				result = first1;
-				break;
-			}
-			if (iter1 == last1) {
-				return result;
-			}
-		}
-		++first1;
-	}
-	return result;
+    ForwardIterator1 result = last1;
+    while (first1 != last1) {
+        ForwardIterator1 iter1 = first1;
+        ForwardIterator2 iter2 = first2;
+        while (pred(*iter1, *iter2)) {
+            ++iter1;
+            ++iter2;
+            if (iter2 == last2) {
+                result = first1;
+                break;
+            }
+            if (iter1 == last1) {
+                return result;
+            }
+        }
+        ++first1;
+    }
+    return result;
 }
 
 //----------------------------------【search() function】------------------------------------
