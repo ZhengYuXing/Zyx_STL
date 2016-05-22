@@ -88,14 +88,14 @@ struct __rb_tree_base_iterator
 template <typename T, typename Ref, typename Ptr>
 struct __rb_tree_iterator : public __rb_tree_base_iterator
 {
-    typedef __rb_tree_iterator<T, T&, T*> 				 iterator;
+    typedef __rb_tree_iterator<T, T&, T*>                iterator;
     typedef __rb_tree_iterator<T, const T&, const T*>    const_iterator;
-    typedef __rb_tree_iterator<T, Ref, Ptr> 			 self;
-    typedef __rb_tree_node<T>* 							 link_type;    
-    typedef bidirectional_iterator_tag 					 iterator_category;
-    typedef T 											 value_type;
-    typedef Ptr 										 pointer;
-    typedef Ref 										 reference;
+    typedef __rb_tree_iterator<T, Ref, Ptr>              self;
+    typedef __rb_tree_node<T>* 	                         link_type;    
+    typedef bidirectional_iterator_tag                   iterator_category;
+    typedef T                                            value_type;
+    typedef Ptr                                          pointer;
+    typedef Ref                                          reference;
 
     __rb_tree_iterator() : __rb_tree_base_iterator(nullptr) { }
     __rb_tree_iterator(link_type x) : __rb_tree_base_iterator(x) { }
@@ -136,21 +136,21 @@ template <typename Key, typename Value, typename KeyOfValue,
 class RedBlackTree
 {
 private:
-    typedef __rb_tree_node_base* 				 base_ptr;
-    typedef __rb_tree_node<Value> 				 rb_tree_node;
+    typedef __rb_tree_node_base*                 base_ptr;
+    typedef __rb_tree_node<Value>                rb_tree_node;
     typedef simple_alloc<rb_tree_node, Alloc>    rb_tree_node_allocator;
-    typedef __rb_tree_color_type 				 color_type;
+    typedef __rb_tree_color_type                 color_type;
 
 public:
-    typedef Key 				 key_type;
-    typedef Value 				 value_type;
-    typedef value_type* 		 pointer;
-    typedef const value_type* 	 const_pointer;
-    typedef value_type& 		 reference;
+    typedef Key                  key_type;
+    typedef Value                value_type;
+    typedef value_type*          pointer;
+    typedef const value_type*    const_pointer;
+    typedef value_type&          reference;
     typedef const value_type&    const_reference;
-    typedef size_t 				 size_type;
-    typedef ptrdiff_t 			 difference_type;
-    typedef rb_tree_node* 		 link_type;
+    typedef size_t               size_type;
+    typedef ptrdiff_t            difference_type;
+    typedef rb_tree_node*        link_type;
 
     typedef __rb_tree_iterator<value_type, reference, pointer> iterator;
 
