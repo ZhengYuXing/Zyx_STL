@@ -82,9 +82,8 @@ ForwardIterator min_element(ForwardIterator first, ForwardIterator last, Compare
 template <typename InputIterator, typename T>
 InputIterator find(InputIterator first, InputIterator last, const T& val)
 {
-    while (first != last && !(*first == val)) {
+    while (first != last && !(*first == val)) 
         ++first;
-    }
     return first;
 }
 
@@ -93,9 +92,8 @@ InputIterator find(InputIterator first, InputIterator last, const T& val)
 template <typename InputIterator, typename UnaryPredicate>
 InputIterator find_if(InputIterator first, InputIterator last, UnaryPredicate pred)
 {
-    while (first != last && !pred(*first)) {
+    while (first != last && !pred(*first))
         ++first;
-    }
     return first;
 }
 
@@ -104,9 +102,8 @@ InputIterator find_if(InputIterator first, InputIterator last, UnaryPredicate pr
 template <typename InputIterator, typename UnaryPredicate>
 InputIterator find_if_not(InputIterator first, InputIterator last, UnaryPredicate pred)
 {
-    while (first != last && pred(*first)) {
+    while (first != last && pred(*first))
         ++first;
-    }
     return first;
 }
 
@@ -200,97 +197,96 @@ ForwardIterator1 find_end(ForwardIterator1 first1, ForwardIterator1 last1,
 
 template <typename ForwardIterator1, typename ForwardIterator2>
 ForwardIterator1 search(ForwardIterator1 first1, ForwardIterator1 last1,
-						ForwardIterator2 first2, ForwardIterator2 last2)
+                        ForwardIterator2 first2, ForwardIterator2 last2)
 {
-	if (first2 == last2)
-		return first1;
+    if (first2 == last2)
+        return first1;
 
-	while (first1 != last1) {
-		ForwardIterator1 iter1 = first1;
-		ForwardIterator2 iter2 = first2;
-		while (*iter1 == *iter2) {
-			++iter1;
-			++iter2;
-			if (iter2 == last2) 
-				return first1;
-			if (iter1 == last1)
-				return last1;
-		}
-		++first1;
-	}
-	return last1;
+    while (first1 != last1) {
+        ForwardIterator1 iter1 = first1;
+        ForwardIterator2 iter2 = first2;
+        while (*iter1 == *iter2) {
+            ++iter1;
+            ++iter2;
+            if (iter2 == last2) 
+                return first1;
+            if (iter1 == last1)
+                return last1;
+        }
+        ++first1;
+    }
+    return last1;
 }
 
 template <typename ForwardIterator1, typename ForwardIterator2, typename BinaryPredicate>
 ForwardIterator1 search(ForwardIterator1 first1, ForwardIterator1 last1,
-						ForwardIterator2 first2, ForwardIterator2 last2,
-						BinaryPredicate pred)
+                        ForwardIterator2 first2, ForwardIterator2 last2,
+                        BinaryPredicate pred)
 {
-	if (first2 == last2)
-		return first1;
+    if (first2 == last2)
+        return first1;
 
-	while (first1 != last1) {
-		ForwardIterator1 iter1 = first1;
-		ForwardIterator2 iter2 = first2;
-		while (pred(*iter1, *iter2)) {
-			++iter1;
-			++iter2;
-			if (iter2 == last2) 
-				return first1;
-			if (iter1 == last1)
-				return last1;
-		}
-		++first1;
-	}
-	return last1;
+    while (first1 != last1) {
+        ForwardIterator1 iter1 = first1;
+        ForwardIterator2 iter2 = first2;
+        while (pred(*iter1, *iter2)) {
+            ++iter1;
+            ++iter2;
+            if (iter2 == last2) 
+                return first1;
+            if (iter1 == last1)
+                return last1;
+        }
+        ++first1;
+    }
+    return last1;
 }
 
 //----------------------------------【search_n() function】-----------------------------------
 
 template <typename ForwardIterator, typename Size, typename T>
-ForwardIterator search_n(ForwardIterator first, ForwardIterator last, 
-						 Size count, const T& val)
+ForwardIterator search_n(ForwardIterator first, ForwardIterator last, Size count, const T& val)
 {
-	if (count <= 0)
-		return first;
+    if (count <= 0)
+        return first;
 
-	ForwardIterator limit = first;
-	Zyx::advance(limit, Zyx::distance(first, last) - count + 1);
-	while (first != limit) {
-		ForwardIterator iter = first;
-		Size i = 0;
-		while (*iter == val) {
-			++i;
-			++iter;
-			if (i == count) 
-				return first;
-		}
-		++first;
-	}
-	return last;
+    ForwardIterator limit = first;
+    Zyx::advance(limit, Zyx::distance(first, last) - count + 1);
+    while (first != limit) {
+        ForwardIterator iter = first;
+        Size i = 0;
+        while (*iter == val) {
+            ++i;
+            ++iter;
+            if (i == count) 
+                return first;
+        }
+        ++first;
+    }
+    return last;
 }
 
 template <typename ForwardIterator, typename Size, typename T, typename BinaryPredicate>
 ForwardIterator search_n(ForwardIterator first, ForwardIterator last, 
-						 Size count, const T& val, BinaryPredicate pred)
+                         Size count, const T& val, BinaryPredicate pred)
 {
-	if (count <= 0)
-		return first;
+    if (count <= 0)
+        return first;
 
-	ForwardIterator limit = first;
-	Zyx::advance(limit, Zyx::distance(first, last) - count + 1);
-	while (first != limit) {
-		ForwardIterator iter = first;
-		Size i = 0;
-		while (pred(*iter, val)) {
-			++i;
-			++iter;
-			if (i == count) 
-				return first;
-		}
-		++first;
-	}
-	return last;	
+    ForwardIterator limit = first;
+    Zyx::advance(limit, Zyx::distance(first, last) - count + 1);
+    while (first != limit) {
+        ForwardIterator iter = first;
+        Size i = 0;
+        while (pred(*iter, val)) {
+            ++i;
+            ++iter;
+            if (i == count) 
+                return first;
+        }
+        ++first;
+    }
+    return last;	
 }
 
 //-------------------------------------【copy() function】------------------------------------
@@ -298,24 +294,24 @@ ForwardIterator search_n(ForwardIterator first, ForwardIterator last,
 template <typename InputIterator, typename OutputIterator>
 OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result)
 {
-	while (first != last) {
-		*result = *first;
-		++first;
-		++result;
-	}
-	return result;
+    while (first != last) {
+        *result = *first;
+        ++first;
+        ++result;
+    }
+    return result;
 }
 
 //---------------------------------【copy_backward() function】-------------------------------
 
 template <typename BidirectionalIterator1, typename BidirectionalIterator2>
 BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, 
-									 BidirectionalIterator1 last,
-									 BidirectionalIterator2 result)
+                                     BidirectionalIterator1 last,
+                                     BidirectionalIterator2 result)
 {
-	while (last != first)
-		*(--result) = *(--last);
-	return result;
+    while (last != first)
+        *(--result) = *(--last);
+    return result;
 }
 
 //-------------------------------------【fill() function】------------------------------------
@@ -323,10 +319,10 @@ BidirectionalIterator2 copy_backward(BidirectionalIterator1 first,
 template <typename ForwardIterator, typename T>
 void fill(ForwardIterator first, ForwardIterator last, const T& val)
 {
-	while (first != last) {
-		*first = val;
-		++first;
-	}
+    while (first != last) {
+        *first = val;
+        ++first;
+    }
 }
 
 //-------------------------------------【fill_n() function】----------------------------------
@@ -334,12 +330,12 @@ void fill(ForwardIterator first, ForwardIterator last, const T& val)
 template <typename OutputIterator, typename Size, typename T>
 OutputIterator fill_n(OutputIterator first, Size n, const T& val)
 {
-	while (n > 0) {
-		*first = val;
-		++first;
-		--n;
-	}
-	return first;
+    while (n > 0) {
+        *first = val;
+        ++first;
+        --n;
+    }
+    return first;
 }
 
 //----------------------------------【for_each() function】-----------------------------------
@@ -347,11 +343,11 @@ OutputIterator fill_n(OutputIterator first, Size n, const T& val)
 template <typename InputIterator, typename Function>
 Function for_each(InputIterator first, InputIterator last, Function fn)
 {
-	while (first != last) {
-		fn(*first);
-		++first;
-	}
-	return fn;
+    while (first != last) {
+        fn(*first);
+        ++first;
+    }
+    return fn;
 }
 
 //-------------------------------【perlocate_down() function】--------------------------------
