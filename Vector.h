@@ -32,6 +32,16 @@ public:
 
 	explicit Vector(size_type n) { fill_initialize(n, T()); }
 
+	template <typename InputIterator>
+	Vector(InputIterator first, InputIterator last) 
+	    : start(nullptr), finish(nullptr), end_of_storage(nullptr)
+	{
+        while (first != last) {
+            push_back(*first);
+            ++first;
+        }
+    }
+
 	Vector(const Vector& x) : start(nullptr), finish(nullptr), end_of_storage(nullptr)
 	{
 		for (const_iterator iter = x.begin(); iter != x.end(); ++iter)
