@@ -338,6 +338,38 @@ OutputIterator fill_n(OutputIterator first, Size n, const T& val)
     return first;
 }
 
+//-------------------------------------【remove() function】----------------------------------
+
+template <typename ForwardIterator, typename T>
+ForwardIterator remove(ForwardIterator first, ForwardIterator last, const T& val)
+{
+    ForwardIterator result = first;
+    while (first != last) {
+        if (!(*first == val)) {
+            *result = *first;        // in c++11 : *result = move(*first)
+            ++result;
+        }
+        ++first;
+    }
+    return result;
+}
+
+//-----------------------------------【remove_if() function】---------------------------------
+
+template <typename ForwardIterator, typename UnaryPredicate>
+ForwardIterator remove_if(ForwardIterator first, ForwardIterator last, UnaryPredicate pred)
+{
+    ForwardIterator result = first;
+    while (first != last) {
+        if (!pred(*first)) {
+            *result = *first;        // in c++11 : *result = move(*first)
+            ++result;
+        }
+        ++first;
+    }
+    return result;
+}
+
 //----------------------------------【for_each() function】-----------------------------------
 
 template <typename InputIterator, typename Function>
@@ -355,34 +387,34 @@ Function for_each(InputIterator first, InputIterator last, Function fn)
 template <typename RandomAccessIterator>
 void perlocate_down(RandomAccessIterator first, RandomAccessIterator last)
 {
-	__perlocate_down_aux(first, last, difference_type(first), value_type(first));
+    __perlocate_down_aux(first, last, difference_type(first), value_type(first));
 }
 
 template <typename RandomAccessIterator, typename Distance, typename T>
 void __perlocate_down_aux(RandomAccessIterator first, RandomAccessIterator last, Distance*, T*)
 {
-	T value = *(last - 1);
-	*(last - 1) = *first;
-	__perlocate_down(first, Distance(0), Distance((last - first) - 1), value);
+    T value = *(last - 1);
+    *(last - 1) = *first;
+    __perlocate_down(first, Distance(0), Distance((last - first) - 1), value);
 }
 
 template <typename RandomAccessIterator, typename Distance, typename T>
 void __perlocate_down(RandomAccessIterator first, Distance holeIndex, Distance len, T value)
 {
-	Distance child = 2 * holeIndex + 1;
-	while (child < len) {
-		if (child + 1 < len && *(first + child) < *(first + child + 1))
-			++child;
+    Distance child = 2 * holeIndex + 1;
+    while (child < len) {
+        if (child + 1 < len && *(first + child) < *(first + child + 1))
+            ++child;
 
-		if (*(first + child) > value)
-			*(first + holeIndex) = *(first + child);
-		else
-			break;
+        if (*(first + child) > value)
+            *(first + holeIndex) = *(first + child);
+        else
+            break;
 
-		holeIndex = child;
-		child = 2 * holeIndex + 1;
-	}
-	*(first + holeIndex) = value;
+        holeIndex = child;
+        child = 2 * holeIndex + 1;
+    }
+    *(first + holeIndex) = value;
 }
 
 //---------------------------------【push_heap() function】-----------------------------------
@@ -390,26 +422,26 @@ void __perlocate_down(RandomAccessIterator first, Distance holeIndex, Distance l
 template <typename RandomAccessIterator>
 void push_heap(RandomAccessIterator first, RandomAccessIterator last)
 {
-	__push_heap_aux(first, last, difference_type(first), value_type(first));
+    __push_heap_aux(first, last, difference_type(first), value_type(first));
 }
 
 template <typename RandomAccessIterator, typename Distance, typename T>
 void __push_heap_aux(RandomAccessIterator first, RandomAccessIterator last, Distance*, T*)
 {
-	__push_heap(first, Distance((last - first) - 1), Distance(0), T(*(last - 1)));
+    __push_heap(first, Distance((last - first) - 1), Distance(0), T(*(last - 1)));
 }
 
 // perlocate up
 template <typename RandomAccessIterator, typename Distance, typename T>
 void __push_heap(RandomAccessIterator first, Distance holeIndex, Distance topIndex, T value)
 {
-	Distance parent = (holeIndex - 1) / 2;
-	while (holeIndex > topIndex && *(first + parent) < value) {
-		*(first + holeIndex) = *(first + parent);
-		holeIndex = parent;
-		parent = (holeIndex - 1) / 2;
-	}
-	*(first + holeIndex) = value;
+    Distance parent = (holeIndex - 1) / 2;
+    while (holeIndex > topIndex && *(first + parent) < value) {
+        *(first + holeIndex) = *(first + parent);
+        holeIndex = parent;
+        parent = (holeIndex - 1) / 2;
+    }
+    *(first + holeIndex) = value;
 }
 
 //---------------------------------【pop_heap() function】------------------------------------
@@ -417,42 +449,41 @@ void __push_heap(RandomAccessIterator first, Distance holeIndex, Distance topInd
 template <typename RandomAccessIterator>
 void pop_heap(RandomAccessIterator first, RandomAccessIterator last)
 {
-	__pop_heap_aux(first, last, value_type(first));
+    __pop_heap_aux(first, last, value_type(first));
 }
 
 template <typename RandomAccessIterator, typename T>
 void __pop_heap_aux(RandomAccessIterator first, RandomAccessIterator last, T*)
 {
-	__pop_heap(first, last - 1, last - 1, T(*(last - 1)), difference_type(first));
+    __pop_heap(first, last - 1, last - 1, T(*(last - 1)), difference_type(first));
 }
 
 template <typename RandomAccessIterator, typename T, typename Distance>
 void __pop_heap(RandomAccessIterator first, RandomAccessIterator last, 
 		  		RandomAccessIterator result, T value, Distance*)
 {
-	*result = *first;
-	__adjust_heap(first, Distance(0), Distance(last - first), value);
+    *result = *first;
+    __adjust_heap(first, Distance(0), Distance(last - first), value);
 }
 
 // perlocate down
 template <typename RandomAccessIterator, typename Distance, typename T>
 void __adjust_heap(RandomAccessIterator first, Distance holeIndex, Distance len, T value)
 {
-	Distance topIndex = holeIndex;
-	Distance secondChild = 2 * holeIndex + 2;
-	while (secondChild < len) {
-		if (*(first + secondChild) < *(first + secondChild - 1))
-			--secondChild;
-		*(first + holeIndex) = *(first + secondChild);
-		holeIndex = secondChild;
-		secondChild = 2 * holeIndex + 2;
-	}
-	if (secondChild == len) {
-		*(first + holeIndex) = *(first + (secondChild - 1));
-		holeIndex = secondChild - 1;
-	}
-	//*(first + holeIndex) = value;
-	__push_heap(first, holeIndex, topIndex, value);
+    Distance topIndex = holeIndex;
+    Distance secondChild = 2 * holeIndex + 2;
+    while (secondChild < len) {
+        if (*(first + secondChild) < *(first + secondChild - 1))
+            --secondChild;
+        *(first + holeIndex) = *(first + secondChild);
+        holeIndex = secondChild;
+        secondChild = 2 * holeIndex + 2;
+    }
+    if (secondChild == len) {
+        *(first + holeIndex) = *(first + (secondChild - 1));
+        holeIndex = secondChild - 1;
+    }
+    __push_heap(first, holeIndex, topIndex, value);
 }
 
 //---------------------------------【sort_heap() function】-----------------------------------
@@ -460,8 +491,8 @@ void __adjust_heap(RandomAccessIterator first, Distance holeIndex, Distance len,
 template <typename RandomAccessIterator>
 void sort_heap(RandomAccessIterator first, RandomAccessIterator last)
 {
-	while (last - first > 1)
-		pop_heap(first, last--);
+    while (last - first > 1)
+        pop_heap(first, last--);
 }
 
 //---------------------------------【make_heap() function】-----------------------------------
@@ -469,21 +500,21 @@ void sort_heap(RandomAccessIterator first, RandomAccessIterator last)
 template <typename RandomAccessIterator>
 void make_heap(RandomAccessIterator first, RandomAccessIterator last)
 {
-	__make_heap(first, last, value_type(first), difference_type(first));
+    __make_heap(first, last, value_type(first), difference_type(first));
 }
 
 template <typename RandomAccessIterator, typename T, typename Distance>
 void __make_heap(RandomAccessIterator first, RandomAccessIterator last, T*, Distance*)
 {
-	if (last - first < 2)
-		return;
+    if (last - first < 2)
+        return;
 
-	Distance len = last - first;
-	Distance parent = (len - 2) / 2;
-	while (parent >= 0) {
-		__adjust_heap(first, parent, len, T(*(first + parent)));
-		--parent;
-	}
+    Distance len = last - first;
+    Distance parent = (len - 2) / 2;
+    while (parent >= 0) {
+        __adjust_heap(first, parent, len, T(*(first + parent)));
+        --parent;
+    }
 }
 
 }
