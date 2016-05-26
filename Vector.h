@@ -157,7 +157,7 @@ public:
     template <typename InputIterator>
     void assign(InputIterator first, InputIterator last)
     {
-        size_type n = last - first;
+        const size_type n = last - first;
         if (end_of_storage - start >= n) {
             iterator result = uninitialized_copy(first, last, start);
             if (result < finish)
