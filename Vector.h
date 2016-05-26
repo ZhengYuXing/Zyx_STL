@@ -154,6 +154,40 @@ public:
     //template <typename InputIterator>
     //void insert(iterator pos, InputIterator first, InputIterator last)
 
+    template <typename InputIterator>
+    void assign(InputIterator first, InputIterator last)
+    {
+        size_type n = last - first;
+        if (end_of_storage - start >= n) {
+            iterator result = uninitialized_copy(first, last, start);
+            if (result < finish)
+                destroy(result, finish);
+            finish = result;
+        } else {
+            destroy(start, finish);
+            deallocate();            
+            start = data_allocator::allocate(n);
+            finish = uninitialized_copy(first, last, start);
+            end_of_storage = start + n;            
+        }
+    }
+
+    void assign(size_type n, const T& val)
+    {
+        if (end_of_storage - start >= n) {
+            iterator result = uninitialized_fill_n(start, n, val);
+            if (result < finish)
+                destroy(result, finish);
+            finish = result;
+        } else {
+            destroy(start, finish);
+            deallocate();
+            start = data_allocator::allocate(n);
+            finish = uninitialized_fill_n(start, n, val);
+            end_of_storage = start + n;
+        }
+    }
+
     iterator erase(iterator pos)
     {
         if (pos + 1 != finish)
