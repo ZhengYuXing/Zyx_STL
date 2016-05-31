@@ -370,6 +370,38 @@ ForwardIterator remove_if(ForwardIterator first, ForwardIterator last, UnaryPred
     return result;
 }
 
+//----------------------------------【remove_copy() function】--------------------------------
+
+template <typename InputIterator, typename OutputIterator, typename T>
+OutputIterator remove_copy(InputIterator first, InputIterator last, 
+                           OutputIterator result, const T& val)
+{
+    while (first != last) {
+        if (!(*first == val)) {
+            *result = *first;
+            ++result;
+        }
+        ++first;
+    }
+    return result;
+}
+
+//--------------------------------【remove_copy_if() function】-------------------------------
+
+template <typename InputIterator, typename OutputIterator, typename UnaryPredicate>
+OutputIterator remove_copy_if(InputIterator first, InputIterator last,
+                              OutputIterator result, UnaryPredicate pred)
+{
+    while (first != last) {
+        if (!pred(*first)) {
+            *result = *first;
+            ++result;
+        }
+        ++first;
+    }
+    return result;
+}
+
 //----------------------------------【for_each() function】-----------------------------------
 
 template <typename InputIterator, typename Function>
