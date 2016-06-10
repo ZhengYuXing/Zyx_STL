@@ -3,61 +3,137 @@
 
 namespace Zyx {
 
-template <typename Arg, typename Result>
-struct unary_function
+template <typename T>
+struct equal_to
 {
-	typedef Arg argument_type;
-	typedef Result result_type;
-};
-
-template <typename Arg1, typename Arg2, typename Result>
-struct binary_function
-{
-	typedef Arg1 first_argument_type;
-	typedef Arg2 second_argument_type;
-	typedef Result result_type;
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef bool result_type;
+    bool operator()(const T& x, const T& y) const { return x == y; }
 };
 
 template <typename T>
-struct negate : public unary_function<T, T>
+struct not_equal_to
 {
-	T operator()(const T& x) const { return -x; }
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef bool result_type;
+    bool operator()(const T& x, const T& y) const { return x != y; }
 };
 
 template <typename T>
-struct equal_to : public binary_function<T, T, T>
+struct less
 {
-	bool operator()(const T& x, const T& y) { return x == y; }
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef bool result_type;
+    bool operator()(const T& x, const T& y) const { return x < y; }
 };
 
 template <typename T>
-struct not_equal_to : public binary_function<T, T, T>
+struct less_equal
 {
-	bool operator()(const T& x, const T& y) { return x != y; }
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef bool result_type;
+    bool operator()(const T& x, const T& y) const { return x <= y; }
 };
 
 template <typename T>
-struct less : public binary_function<T, T, T>
+struct greater
 {
-	bool operator()(const T& x, const T& y) { return x < y; }
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef bool result_type;
+    bool operator()(const T& x, const T& y) const { return x > y; }
 };
 
 template <typename T>
-struct less_equal : public binary_function<T, T, T>
+struct greater_equal
 {
-	bool operator()(const T& x, const T& y) { return x <= y; }
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef bool result_type;
+    bool operator()(const T& x, const T& y) const { return x >= y; }
+};
+
+template <typename T> 
+struct negate
+{
+    typedef T argument_type;
+    typedef T result_type;
+    T operator()(const T& x) const { return -x; }
 };
 
 template <typename T>
-struct greater : public binary_function<T, T, T>
+struct plus
 {
-	bool operator()(const T& x, const T& y) { return x > y; }
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef T result_type;
+    T operator()(const T& x, const T& y) const { return x + y; }
 };
 
 template <typename T>
-struct greater_equal : public binary_function<T, T, T>
+struct minus
 {
-	bool operator()(const T& x, const T& y) { return x >= y; }
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef T result_type;
+    T operator()(const T& x, const T& y) const { return x - y; }
+};
+
+template <typename T>
+struct multiplies
+{
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef T result_type;
+    T operator()(const T& x, const T& y) const { return x * y; }
+};
+
+template <typename T>
+struct divides
+{
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef T result_type;
+    T operator()(const T& x, const T& y) const { return x / y; }
+};
+
+template <typename T>
+struct modulus
+{
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef T result_type;
+    T operator()(const T& x, const T& y) const { return x % y; }
+};
+
+template <typename T>
+struct logical_and
+{
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef T result_type;
+    bool operator()(const T& x, const T& y) const { return x && y; }
+};
+
+template <typename T>
+struct logical_or
+{
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef T result_type;
+    bool operator()(const T& x, const T& y) const { return x || y; }
+};
+
+template <typename T>
+struct logical_not
+{
+    typedef T argument_type;
+    typedef T result_type;
+    bool operator()(const T& x) const { return !x; }
 };
 
 }
