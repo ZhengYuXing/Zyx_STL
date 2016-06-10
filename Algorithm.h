@@ -416,6 +416,27 @@ OutputIterator remove_copy_if(InputIterator first, InputIterator last,
     return result;
 }
 
+//---------------------------------【transform() function】-----------------------------------
+
+template <typename InputIterator, typename OutputIterator, typename UnaryPredicate>
+OutputIterator transform(InputIterator first, InputIterator last, 
+                         OutputIterator result, UnaryPredicate op)
+{
+    for (; first != last; ++first, ++result)
+        *result = op(*first);
+    return result;
+}
+
+template <typename InputIterator1, typename InputIterator2, 
+          typename OutputIterator, typename BinaryPredicate>
+OutputIterator transform(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, 
+                         OutputIterator result, BinaryPredicate binary_op)
+{
+    for (; first1 != last1; ++first1, ++first2, ++result)
+        *result = binary_op(*first1, *first2);
+    return result;
+}
+
 //----------------------------------【reverse() function】------------------------------------
 
 template <typename BidirectionalIterator>
