@@ -437,6 +437,92 @@ OutputIterator transform(InputIterator1 first1, InputIterator1 last1, InputItera
     return result;
 }
 
+//-----------------------------------【unique() function】------------------------------------
+
+template <typename ForwardIterator>
+ForwardIterator unique(ForwardIterator first, ForwardIterator last)
+{
+    if (first == last)
+        return last;
+    ForwardIterator result = first;
+    while (++first != last) 
+        if (!(*result == *first))
+            *(++result) = *first;
+    return ++result;
+}
+
+template <typename ForwardIterator, typename BinaryPredicate>
+ForwardIterator unique(ForwardIterator first, ForwardIterator last, BinaryPredicate pred)
+{
+    if (first == last)
+        return last;
+    ForwardIterator result = first;
+    while (++first != last) 
+        if (!pred(*result, *first))
+            *(++result) = *first;
+    return ++result;
+}
+
+//--------------------------------【unique_copy() function】----------------------------------
+
+template <typename InputIterator, typename OutputIterator>
+OutputIterator unique_copy(InputIterator first, InputIterator last, OutputIterator result)
+{
+    if (first == last)
+        return result;
+    return __unique_copy(first, last, result, iterator_category(result));
+}
+
+template <typename InputIterator, typename ForwardIterator>
+ForwardIterator __unique_copy(InputIterator first, InputIterator last, 
+                              ForwardIterator result, forward_iterator_tag)
+{
+    *result = *first;
+    while (++first != last) 
+        if (!(*result == *first))
+            *(++result) = *first;
+    return ++result;
+}
+
+template <typename InputIterator, typename OutputIterator>
+OutputIterator __unique_copy(InputIterator first, InputIterator last,
+                             OutputIterator result, output_iterator_tag)
+{
+    return __unique_copy(first, last, result, output_iterator_tag, value_type(first));
+}
+
+template <typename InputIterator, typename OutputIterator, typename T>
+OutputIterator __unique_copy(InputIterator first, InputIterator last,
+                             OutputIterator result, output_iterator_tag, T*)
+{
+    T value = *first;
+    *result = *first;
+    while (++first != last) {
+        if (!(value == *first)) {
+            value = *first;
+            *(++result) = value;
+        }
+    }
+    return ++result;
+}
+
+template <typename InputIterator, typename OutputIterator, typename BinaryPredicate>
+OutputIterator unique_copy(InputIterator first, InputIterator last, 
+                           OutputIterator result, BinaryPredicate pred)
+{
+    if (first == last)
+        return result;
+    typename iterator_traits<InputIterator>::value_type value = *first;
+    *result = value;
+    while (++first != last) {
+        if (!pred(value, *first)) {
+            value = *first;
+            *(++result) = value;
+        }
+    }
+    return ++result;
+}
+
 //----------------------------------【reverse() function】------------------------------------
 
 template <typename BidirectionalIterator>
