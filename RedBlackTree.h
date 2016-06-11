@@ -175,8 +175,29 @@ public:
 public:
     iterator insert_equal(const value_type& val)
     {
-
+        link_type y = header;
+        link_type x = root();
+        while (x != nullptr) {
+            y = x;
+            x = key_compare(KeyOfValue()(val), key(x)) ? left(x) : right(x);
+        }
+        return __insert(x, y, val);
     }    
+
+    Pair<iterator, bool> insert_unique(const value_type& val)
+    {
+        link_type y = header;
+        link_type x = root();
+        bool comp = true;
+        while (x != nullptr) {
+            y = x;
+            comp = key_compare(KeyOfValue()(val), key(x));
+            x = comp ? left(x) : right(x);
+        }
+
+        iterator j = iterator(y);
+        
+    }
 
 private:
     void init()
@@ -188,9 +209,35 @@ private:
         rightmost() = header;		
     }
 
-    iterator __insert(base_ptr x, base_ptr y, const value_type& val)
+    iterator __insert(base_ptr x_, base_ptr y_, const value_type& val)
     {
+        link_type x = (link_type) x_;
+        link_type y = (link_type) y_;    
+        link_type z;
 
+        if (y == header || x != nullptr || key_compare(KeyOfValue()(val), key(y))) {
+            z = create_node(val);
+            left(y) = z;
+            if (y == header) {
+                root() = z;
+                rightmost() = z;
+            } else if (y == leftmost()) {
+                leftmost() = z;
+            }
+        } else {
+            z = create_node(val);
+            right(y) = z;
+            if (y == rightmost()) 
+                rightmost() = z;
+        }
+        
+        parent(z) = y;
+        left(z) = nullptr;
+        right(z) = nullptr;
+
+        __rb_tree_rebalance(z, header->parent);
+        ++node_count;
+        return iterator(z);
     }
 
 private:
