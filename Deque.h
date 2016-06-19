@@ -35,7 +35,7 @@ struct __deque_iterator
 
 	__deque_iterator() : cur(nullptr), first(nullptr), last(nullptr), node(nullptr) { }
 	__deque_iterator(const iterator& x) : cur(x.cur), first(x.first), last(x.last), node(x.node) { }
-	__deque_iterator(const const_iterator& x) : cur(x.cur), first(x.first), last(x.last), node(x.node) { }
+	// __deque_iterator(const const_iterator& x) : cur(x.cur), first(x.first), last(x.last), node(x.node) { }
 
 	static size_type buffer_size() { return __deque_buf_size(BufSiz, sizeof(T)); }
 

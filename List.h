@@ -36,7 +36,7 @@ struct __list_iterator
 	__list_iterator() : node(nullptr) { }
 	__list_iterator(link_type x) : node(x) { }
 	__list_iterator(const iterator& x) : node(x.node) { }
-	__list_iterator(const const_iterator& x) : node(x.node) { }
+	// __list_iterator(const const_iterator& x) : node(x.node) { }
 
 	bool operator==(const self& x) const { return node == x.node; }
 	bool operator!=(const self& x) const { return node != x.node; }
@@ -243,10 +243,8 @@ public:
 	{
 		iterator first = begin();
 		iterator last = end();
-
 		if (first == last)
 			return;
-
 		iterator cur = first;
 		while (++cur != last) {
 			if (*cur == *first) 
