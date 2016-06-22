@@ -28,10 +28,12 @@ struct Pair
 
     Pair() { }
 
+    Pair(const first_type& a, const second_type& b) : first(a), second(b) { }
+
+    Pair(const Pair& pr) : first(pr.first), second(pr.second) { }
+
     template <typename U, typename V>
     Pair(const Pair<U, V>& pr) : first(pr.first), second(pr.second) { }
-
-    Pair(const first_type& a, const second_type& b) : first(a), second(b) { }
 
     Pair& operator=(const Pair& pr)
     {

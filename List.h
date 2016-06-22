@@ -75,12 +75,18 @@ template <typename T, typename Alloc = alloc>
 class List
 {
 public:
-	friend bool operator==(const List& lhs, const List& rhs);
-	friend bool operator!=(const List& lhs, const List& rhs);
-	friend bool operator<(const List& lhs, const List& rhs);
-	friend bool operator<=(const List& lhs, const List& rhs);
-	friend bool operator>(const List& lhs, const List& rhs);
-	friend bool operator>=(const List& lhs, const List& rhs);
+	template <typename T, typename Alloc>
+	friend bool operator==(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
+	template <typename T, typename Alloc>
+	friend bool operator!=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
+	template <typename T, typename Alloc>
+	friend bool operator<(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
+	template <typename T, typename Alloc>
+	friend bool operator<=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
+	template <typename T, typename Alloc>
+	friend bool operator>(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
+	template <typename T, typename Alloc>
+	friend bool operator>=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
 
 private:
 	typedef __list_node<T> 				      list_node;
