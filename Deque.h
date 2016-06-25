@@ -1,6 +1,7 @@
 #ifndef ZYX_DEQUE
 #define ZYX_DEQUE 
 
+#include "Iterator.h"
 #include "Alloc.h"
 #include "Construct.h"
 #include "Algorithm.h"
@@ -471,49 +472,60 @@ private:
 };
 
 template <typename T, typename Alloc, size_t BufSiz>
-bool operator==(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs)
+inline bool operator==(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs)
 {
-	if (lhs.size() != rhs.size())
-		return false;
+    typedef typename Deque<T, Alloc>::const_iterator const_iterator;
+    const_iterator end1 = lhs.end();
+    const_iterator end2 = rhs.end();
+    const_iterator i1 = lhs.begin();
+    const_iterator i2 = rhs.begin();    
+    while (i1 != end1 && i2 != end2 && *i1 == *i1) {
+    	++i1;
+    	++i2;
+    }    
+    return i1 == end1 && i2 == end2;
+
+	// if (lhs.size() != rhs.size())
+	// 	return false;
 	
-	for (Deque<T, Alloc, BufSiz>::size_type i = 0; i < lhs.size(); i++)
-		if (lhs[i] != rhs[i])
-			return false;
-	return true;
+	// for (Deque<T, Alloc, BufSiz>::size_type i = 0; i < lhs.size(); i++)
+	// 	if (lhs[i] != rhs[i])
+	// 		return false;
+	// return true;
 }
 
-template <typename T, typename Alloc, size_t BufSiz>
-bool operator!=(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs)
+template <typename T, typename Alloc>
+inline bool operator!=(const Deque<T, Alloc>& lhs, const Deque<T, Alloc>& rhs)
 {
-	return !(lhs == rhs);
+    return !(lhs == rhs);
 }
 
-template <typename T, typename Alloc, size_t BufSiz>
-bool operator<(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs)
+template <typename T, typename Alloc>
+inline bool operator<(const Deque<T, Alloc>& lhs, const Deque<T, Alloc>& rhs)
 {
-
+    return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
-template <typename T, typename Alloc, size_t BufSiz>
-bool operator<=(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs)
+template <typename T, typename Alloc>
+inline bool operator>(const Deque<T, Alloc>& lhs, const Deque<T, Alloc>& rhs)
 {
-
+    return rhs < lhs;
 }
 
-template <typename T, typename Alloc, size_t BufSiz>
-bool operator>(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs)	
+template <typename T, typename Alloc>
+inline bool operator<=(const Deque<T, Alloc>& lhs, const Deque<T, Alloc>& rhs)
 {
-
-}		
-
-template <typename T, typename Alloc, size_t BufSiz>
-bool operator>=(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs)	
-{
-
+    return !(rhs < lhs);
 }
 
-template <typename T, typename Alloc, size_t BufSiz>
-void swap(Deque<T, Alloc, BufSiz>& x, Deque<T, Alloc, BufSiz>& y)
+template <typename T, typename Alloc>
+inline bool operator>=(const Deque<T, Alloc>& lhs, const Deque<T, Alloc>& rhs)
+{
+    return !(lhs < rhs);
+}
+
+template <typename T, typename Alloc>
+inline void swap(Deque<T, Alloc>& x, Deque<T, Alloc>& y)
 {
 	x.swap(y);
 }

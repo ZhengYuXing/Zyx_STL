@@ -40,6 +40,8 @@ public:
             push_back(*first);
             ++first;
         }
+
+        
     }
 
     Vector(const Vector& x) : start(nullptr), finish(nullptr), end_of_storage(nullptr)
@@ -279,7 +281,52 @@ private:
 };
 
 template <typename T, typename Alloc>
-void swap(Vector<T, Alloc>& x, Vector<T, Alloc>& y)
+inline bool operator==(const Vector<T, Alloc>& lhs, const Vector<T, Alloc>& rhs)
+{
+    typedef typename Vector<T, Alloc>::const_iterator const_iterator;
+    const_iterator end1 = lhs.end();
+    const_iterator end2 = rhs.end();
+    const_iterator i1 = lhs.begin();
+    const_iterator i2 = rhs.begin();    
+    while (i1 != end1 && i2 != end2 && *i1 == *i1) {
+        ++i1;
+        ++i2;
+    }    
+    return i1 == end1 && i2 == end2;
+}
+
+template <typename T, typename Alloc>
+inline bool operator!=(const Vector<T, Alloc>& lhs, const Vector<T, Alloc>& rhs)
+{
+    return !(lhs == rhs);
+}
+
+template <typename T, typename Alloc>
+inline bool operator<(const Vector<T, Alloc>& lhs, const Vector<T, Alloc>& rhs)
+{
+    return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <typename T, typename Alloc>
+inline bool operator>(const Vector<T, Alloc>& lhs, const Vector<T, Alloc>& rhs)
+{
+    return rhs < lhs;
+}
+
+template <typename T, typename Alloc>
+inline bool operator<=(const Vector<T, Alloc>& lhs, const Vector<T, Alloc>& rhs)
+{
+    return !(rhs < lhs);
+}
+
+template <typename T, typename Alloc>
+inline bool operator>=(const Vector<T, Alloc>& lhs, const Vector<T, Alloc>& rhs)
+{
+    return !(lhs < rhs);
+}
+
+template <typename T, typename Alloc>
+inline void swap(Vector<T, Alloc>& x, Vector<T, Alloc>& y)
 {
     x.swap(y);
 }

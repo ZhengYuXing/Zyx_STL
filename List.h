@@ -4,6 +4,7 @@
 #include "Iterator.h"
 #include "Alloc.h"
 #include "Construct.h"
+#include "Algorithm.h"
 #include "Utility.h"
 
 namespace Zyx {
@@ -74,20 +75,6 @@ struct __list_iterator
 template <typename T, typename Alloc = alloc>
 class List
 {
-public:
-	template <typename T, typename Alloc>
-	friend bool operator==(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
-	template <typename T, typename Alloc>
-	friend bool operator!=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
-	template <typename T, typename Alloc>
-	friend bool operator<(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
-	template <typename T, typename Alloc>
-	friend bool operator<=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
-	template <typename T, typename Alloc>
-	friend bool operator>(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
-	template <typename T, typename Alloc>
-	friend bool operator>=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs);
-
 private:
 	typedef __list_node<T> 				      list_node;
 	typedef simple_alloc<list_node, Alloc>    list_node_allocator;
@@ -107,15 +94,14 @@ public:
 public:
 	List() { empty_intialize(); }
 
-	/* failed!!!
-	explicit List(size_type n, const T& val = T())
+	// explicit List(size_type n) { default_initialize(n); }
+
+	List(size_type n, const value_type& val)
 	{
 		empty_intialize();
-		for (int i = 0; i < n; i++)
-			push_back(val);
+		fill_initialize(n, val);
 	}
-	*/
-
+	
 	template <typename InputIterator>
 	List(InputIterator first, InputIterator last)
 	{
@@ -174,13 +160,13 @@ public:
 	const_reference back() const { return *(--end()); }
 
 public:
-	void push_front(const T& val) { insert(begin(), val); }
-	void push_back(const T& val) { insert(end(), val); }
+	void push_front(const value_type& val) { insert(begin(), val); }
+	void push_back(const value_type& val) { insert(end(), val); }
 
 	void pop_front() { erase(begin()); }
 	void pop_back() { erase(--end()); }
 
-	iterator insert(iterator pos, const T& val)
+	iterator insert(iterator pos, const value_type& val)
 	{
  		link_type tmp = create_node(val);
  		tmp->next = pos.node;
@@ -188,6 +174,19 @@ public:
  		pos.node->prev->next = tmp;
  		pos.node->prev = tmp;
  		return tmp;
+	}
+
+	void insert(iterator pos, size_type n, const value_type& val)
+	{
+        List tmp(n, val);
+        splice(pos, tmp);
+	}
+
+	template <typename InputIterator>
+	void insert(iterator pos, InputIterator first, InputIterator last)
+	{
+		List tmp(first, last);
+		splice(pos, tmp);
 	}
 
 	iterator erase(iterator pos)
@@ -198,6 +197,13 @@ public:
 		next_node->prev = prev_node;
 		destroy_node(pos.node);
 		return next_node;
+	}
+
+	iterator erase(iterator first, iterator last)
+	{
+		while (first != last)
+			first = erase(first);
+		return last;
 	}
 
 	void clear()
@@ -218,7 +224,7 @@ public:
 	}
 
 public:
-	void remove(const T& val)
+	void remove(const value_type& val)
 	{
 		iterator first = begin();
 		iterator last = end();
@@ -382,6 +388,17 @@ private:
 		node->prev = node;
 	}
 
+	void default_initialize(size_type n)
+	{
+
+	}
+
+    void fill_initialize(size_type n, const value_type& val)
+    {
+    	while (n--)
+    		push_back(val);
+    }
+
 	void transfer(iterator pos, iterator first, iterator last)
 	{
 		last.node->prev->next = pos.node;
@@ -398,7 +415,52 @@ private:
 };
 
 template <typename T, typename Alloc>
-void swap(List<T, Alloc>& x, List<T, Alloc>& y)
+inline bool operator==(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
+{
+    typedef typename List<T, Alloc>::const_iterator const_iterator;
+    const_iterator end1 = lhs.end();
+    const_iterator end2 = rhs.end();
+    const_iterator i1 = lhs.begin();
+    const_iterator i2 = rhs.begin();    
+    while (i1 != end1 && i2 != end2 && *i1 == *i1) {
+    	++i1;
+    	++i2;
+    }    
+    return i1 == end1 && i2 == end2;
+}
+
+template <typename T, typename Alloc>
+inline bool operator!=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
+{
+    return !(lhs == rhs);
+}
+
+template <typename T, typename Alloc>
+inline bool operator<(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
+{
+    return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <typename T, typename Alloc>
+inline bool operator>(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
+{
+    return rhs < lhs;
+}
+
+template <typename T, typename Alloc>
+inline bool operator<=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
+{
+    return !(rhs < lhs);
+}
+
+template <typename T, typename Alloc>
+inline bool operator>=(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
+{
+    return !(lhs < rhs);
+}
+
+template <typename T, typename Alloc>
+inline void swap(List<T, Alloc>& x, List<T, Alloc>& y)
 {
 	x.swap(y);
 }
