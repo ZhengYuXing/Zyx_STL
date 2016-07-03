@@ -137,49 +137,49 @@ template <typename Key, typename Value, typename Compare, typename Alloc>
 inline bool operator==(const Map<Key, Value, Compare, Alloc>& lhs, 
                        const Map<Key, Value, Compare, Alloc>& rhs)
 {
-	return lhs.t == rhs.t;
+    return lhs.t == rhs.t;
 }
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline bool operator!=(const Map<Key, Value, Compare, Alloc>& lhs, 
                        const Map<Key, Value, Compare, Alloc>& rhs)
 {
-	return !(lhs == rhs);
+    return !(lhs == rhs);
 }
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline bool operator<(const Map<Key, Value, Compare, Alloc>& lhs, 
                        const Map<Key, Value, Compare, Alloc>& rhs)
 {
-	return lhs.t < rhs.t;
+    return lhs.t < rhs.t;
 }
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline bool operator>(const Map<Key, Value, Compare, Alloc>& lhs, 
                        const Map<Key, Value, Compare, Alloc>& rhs)
 {
-	return rhs < lhs;
+    return rhs < lhs;
 }
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline bool operator<=(const Map<Key, Value, Compare, Alloc>& lhs, 
                        const Map<Key, Value, Compare, Alloc>& rhs)
 {
-	return !(rhs < lhs);
+    return !(rhs < lhs);
 }
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline bool operator>=(const Map<Key, Value, Compare, Alloc>& lhs, 
                        const Map<Key, Value, Compare, Alloc>& rhs)
 {
-	return !(lhs < rhs);
+    return !(lhs < rhs);
 }
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline void swap(Map<Key, Value, Compare, Alloc>& lhs, 
 	             Map<Key, Value, Compare, Alloc>& rhs)
 {
-	lhs.swap(rhs);
+    lhs.swap(rhs);
 }
 
 }
