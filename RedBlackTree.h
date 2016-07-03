@@ -1,8 +1,10 @@
 #ifndef ZYX_RED_BLACK_TREE
 #define ZYX_RED_BLACK_TREE 
 
+#include "Iterator.h"
 #include "Alloc.h"
 #include "Construct.h"
+#include "Algorithm.h"
 #include "Utility.h"
 
 namespace Zyx {
@@ -45,9 +47,13 @@ struct __rb_tree_node : public __rb_tree_node_base
 
 struct __rb_tree_base_iterator
 {
-    typedef __rb_tree_node_base::base_ptr base_ptr;
+    typedef __rb_tree_node_base::base_ptr    base_ptr;
+    typedef bidirectional_iterator_tag       iterator_category;
+    typedef ptrdiff_t                        difference_type;
 
     base_ptr node;
+
+    // __rb_tree_base_iterator(base_ptr x) : node(x) { }
 
     void increment()
     {
@@ -88,20 +94,23 @@ struct __rb_tree_base_iterator
 template <typename T, typename Ref, typename Ptr>
 struct __rb_tree_iterator : public __rb_tree_base_iterator
 {
+    typedef __rb_tree_iterator<T, Ref, Ptr>              self;
     typedef __rb_tree_iterator<T, T&, T*>                iterator;
     typedef __rb_tree_iterator<T, const T&, const T*>    const_iterator;
-    typedef __rb_tree_iterator<T, Ref, Ptr>              self;
     typedef __rb_tree_node<T>* 	                         link_type;    
     typedef bidirectional_iterator_tag                   iterator_category;
     typedef T                                            value_type;
     typedef Ptr                                          pointer;
     typedef Ref                                          reference;
 
-    __rb_tree_iterator() : __rb_tree_base_iterator(nullptr) { }
-    __rb_tree_iterator(link_type x) : __rb_tree_base_iterator(x) { }
-    __rb_tree_iterator(const iterator& x) : __rb_tree_base_iterator(x.node) { }
+    __rb_tree_iterator() { }
+    __rb_tree_iterator(link_type x) { node = x; } // ????
+    __rb_tree_iterator(const iterator& x) { node = x.node; } // ????
 
-    reference operator*() const { return ((link_type)node)->data; }
+    bool operator==(const self& x) const { return node == x.node; }
+    bool operator!=(const self& x) const { return node != x.node; }
+
+    reference operator*() const { return static_cast<link_type>(node)->data; }
     pointer operator->() const { return &(operator*()); }
 
     self& operator++()
@@ -153,10 +162,25 @@ public:
     typedef rb_tree_node*        link_type;
 
     typedef __rb_tree_iterator<value_type, reference, pointer> iterator;
+    typedef __rb_tree_iterator<value_type, const_reference, const_pointer> const_iterator;
 
 public:
     RedBlackTree(const Compare& comp = Compare()) 
-        : node_count(0), key_compare(comp) { init(); }
+      : node_count(0), key_compare(comp) { empty_intialize(); }
+
+    RedBlackTree(const RedBlackTree& x) 
+      : node_count(x.node_count), key_compare(x.key_compare)
+    {
+        if (x.root() == nullptr) {
+            empty_intialize();
+        } else {
+            header = get_node();
+            color(header) = __rb_tree_red;
+            root() = __copy(x.root(), header);
+            leftmost() = minimum(root());  // ????
+            rightmost() = maximum(root()); // ????
+        }        
+    }
 
     ~RedBlackTree()
     {
@@ -164,10 +188,37 @@ public:
         put_node(header);
     }
 
-public:
-    iterator begin() { return leftmost(); }
-    iterator end() { return header; }
+    RedBlackTree& operator=(const RedBlackTree& x)
+    {
+        if (this != &x) {
+            RedBlackTree tmp(x);
+            swap(tmp);
+        }
+        return *this;
 
+        // if (this != &x) {
+        //     clear();
+        //     node_count = x.node_count;
+        //     key_compare = x.key_compare;
+        //     if (x.root() == nullptr) {
+        //         root() = nullptr;
+        //         leftmost() = header;
+        //         rightmost() = header;
+        //     } else {
+        //         root() = __copy(x.root(), header);
+        //         leftmost() = minimum(root());
+        //         rightmost() = maximum(root());
+        //     }
+        // }
+        // return *this;        
+    }
+
+public:
+    Compare key_comp() const { return key_compare; }
+    iterator begin() { return leftmost(); }
+    const_iterator begin() const { return leftmost(); }
+    iterator end() { return header; }
+    const_iterator end() const { return header; }
     bool empty() const { return node_count == 0; }
     size_type size() const { return node_count; }
     size_type max_size() const { return size_type(-1); }
@@ -196,17 +247,198 @@ public:
         }
 
         iterator j = iterator(y);
-        
+        if (comp) {
+            if (j == begin())
+                return make_pair(__insert(x, y, val), true);
+            else 
+                --j;
+        }
+
+        if (key_compare(key(j.node), KeyOfValue()(val)))
+            return make_pair(__insert(x, y, val), true);
+
+        return make_pair(j, false);
+    }
+
+    template <typename InputIterator>
+    void insert_equal(InputIterator first, InputIterator last)
+    {
+        for (; first != last; ++first)
+            insert_equal(*first);
+    }
+
+    template <typename InputIterator>
+    void insert_unique(InputIterator first, InputIterator last)
+    {
+        for (; first != last; ++first)
+            insert_unique(*first);
+    }
+
+    void clear() 
+    {
+        if (node_count != 0) {
+            __erase(root());
+            root() = nullptr;
+            leftmost() = header;
+            rightmost() = header;
+            node_count = 0;
+        }
+    }
+
+    void swap(RedBlackTree& t)
+    {
+        Zyx::swap(header, t.header);
+        Zyx::swap(node_count, t.node_count);
+        Zyx::swap(key_compare, t.key_compare);
+    }
+
+    iterator find(const key_type& k)
+    {
+        link_type y = header;
+        link_type x = root();
+        while (x != nullptr) {
+            if (!key_compare(key(x), k)) {
+                y = x;
+                x = left(x);
+            } else {
+                x = right(x);
+            }
+        }
+        iterator j = iterator(y);
+        return (j == end() || key_compare(k, key(j.node))) ? end() : j;
+    }
+
+    const_iterator find(const key_type& k) const
+    {
+        link_type y = header;
+        link_type x = root();
+        while (x != nullptr) {
+            if (!key_compare(key(x), k)) {
+                y = x;
+                x = left(x);
+            } else {
+                x = right(x);
+            }
+        }
+        const_iterator j = const_iterator(y);
+        return (j == end() || key_compare(k, key(j.node))) ? end() : j;
+    }    
+
+    size_type count(const key_type& k) const
+    {
+        Pair<const_iterator, const_iterator> p = equal_range(k);
+        return distance(p.first, p.second);
+    }
+
+    iterator lower_bound(const key_type& k)
+    {
+        link_type y = header;
+        link_type x = root();
+        while (x != nullptr) {
+            if (!key_compare(key(x), k)) {
+                y = x;
+                x = left(x);
+            } else {
+                x = right(x);
+            }
+        }
+        return iterator(y);
+    }
+
+    const_iterator lower_bound(const key_type& k) const
+    {
+        link_type y = header;
+        link_type x = root();
+        while (x != nullptr) {
+            if (!key_compare(key(x), k)) {
+                y = x;
+                x = left(x);
+            } else {
+                x = right(x);
+            }
+        }
+        return const_iterator(y);
+    }
+
+    iterator upper_bound(const key_type& k)
+    {
+        link_type y = header;
+        link_type x = root();
+        while (x != nullptr) {
+            if (key_compare(k, key(x))) {
+                y = x;
+                x = left(x);
+            } else {
+                x = right(x);
+            }
+        }
+        return iterator(y);
+    }
+
+    const_iterator upper_bound(const key_type& k) const
+    {
+        link_type y = header;
+        link_type x = root();
+        while (x != nullptr) {
+            if (key_compare(k, key(x))) {
+                y = x;
+                x = left(x);
+            } else {
+                x = right(x);
+            }
+        }
+        return const_iterator(y);
+    }
+
+    Pair<iterator, iterator> equal_range(const key_type& k)
+    {
+        return make_pair(lower_bound(k), upper_bound(k));
+    }
+
+    Pair<const_iterator, const_iterator> equal_range(const key_type& k) const
+    {
+        return make_pair(lower_bound(k), upper_bound(k));
     }
 
 private:
-    void init()
+    void empty_intialize()
     {
         header = get_node();
         color(header) = __rb_tree_red;
         root() = nullptr;
         leftmost() = header;
         rightmost() = header;		
+    }
+
+    link_type __copy(link_type x, link_type p)
+    {
+        link_type top = clone_node(x);
+        top->parent = p;
+        if (x->right)
+            top->right = __copy(right(x), top);
+        p = top;
+        x = left(x);
+
+        while (x != nullptr) {
+            link_type y = clone_node(x);
+            p->left = y;
+            y->parent = p;
+            if (x->right)
+                y->right = __copy(right(x), y);
+            p = y;
+            x = left(x);
+        }
+
+        return top;
+
+        // another way:
+        // link_type top = clone_node(x);
+        // top->parent = p;
+        // if (x->left) 
+        //     top->left = __copy(left(x), top);
+        // if (x->right) 
+        //     top->right = __copy(right(x), top);
+        // return top;
     }
 
     iterator __insert(base_ptr x_, base_ptr y_, const value_type& val)
@@ -234,10 +466,97 @@ private:
         parent(z) = y;
         left(z) = nullptr;
         right(z) = nullptr;
-
         __rb_tree_rebalance(z, header->parent);
         ++node_count;
         return iterator(z);
+    }
+
+    void __erase(link_type x)
+    {
+        if (x != nullptr) {
+            __erase(right(x));
+            link_type y = left(x);
+            destroy_node(x);
+            x = y;
+        }
+    }
+
+private:
+    void __rb_tree_rotate_left(base_ptr x, base_ptr& root)
+    {
+        base_ptr y = x->right;
+        x->right = y->left;
+        if (y->left != nullptr)
+            y->left->parent = x;
+        y->parent = x->parent;
+
+        if (x == root)
+            root = y;
+        else if (x == x->parent->left)
+            x->parent->left = y;
+        else
+            x->parent->right = y;
+        y->left = x;
+        x->parent = y;
+    }
+
+    void __rb_tree_rotate_right(base_ptr x, base_ptr& root)
+    {
+        base_ptr y = x->left;
+        x->left = y->right;
+        if (y->right != nullptr)
+            y->right->parent = x;
+        y->parent = x->parent;
+
+        if (x == root)
+            root = y;
+        else if (x == x->parent->left)
+            x->parent->left = y;
+        else
+            x->parent->right = y;
+        y->right = x;
+        x->parent = y;
+    }
+
+    void __rb_tree_rebalance(base_ptr x, base_ptr& root)
+    {
+        x->color = __rb_tree_red;
+        while (x != root && x->parent->color == __rb_tree_red) {
+            if (x->parent == x->parent->parent->left) {
+                base_ptr y = x->parent->parent->right;
+                if (y != nullptr && y->color == __rb_tree_red) {
+                    x->parent->color = __rb_tree_black;
+                    y->color = __rb_tree_black;
+                    x->parent->parent->color = __rb_tree_red;
+                    x = x->parent->parent;
+                } else {
+                    if (x == x->parent->right) {
+                        x = x->parent;
+                        __rb_tree_rotate_left(x, root);
+                    }
+                    x->parent->color = __rb_tree_black;
+                    x->parent->parent->color = __rb_tree_red;
+                    __rb_tree_rotate_right(x->parent->parent, root);
+                }
+            } else {
+                base_ptr y = x->parent->parent->left;
+                if (y != nullptr && y->color == __rb_tree_red) {
+                    x->parent->color = __rb_tree_black;
+                    y->color =  __rb_tree_black;
+                    x->parent->parent->color = __rb_tree_red;
+                    x = x->parent->parent;
+                } else {
+                    if (x == x->parent->left) {
+                        x = x->parent;
+                        __rb_tree_rotate_right(x, root);
+                    }
+                    x->parent->color = __rb_tree_black;
+                    x->parent->parent->color = __rb_tree_red;
+                    __rb_tree_rotate_left(x->parent->parent, root);
+                }
+            }
+        }
+        root->color = __rb_tree_black;
     }
 
 private:
@@ -259,18 +578,18 @@ private:
 
     link_type clone_node(link_type x)
     {
-        link_type tmp = create_node(x.data);
+        link_type tmp = create_node(x->data);
         tmp->color = x->color;
         tmp->left = nullptr;
         tmp->right = nullptr;
         return tmp;
     }
 
+private:
     link_type& root() const { return (link_type&)header->parent; }
     link_type& leftmost() const { return (link_type&)header->left; }
     link_type& rightmost() const { return (link_type&)header->right; }
 
-private:
     static link_type& left(link_type x) { return (link_type&)x->left; }
     static link_type& right(link_type x) { return (link_type&)x->right; }
     static link_type& parent(link_type x) { return (link_type&)x->parent; }
@@ -293,6 +612,55 @@ private:
     link_type header;
     Compare key_compare;
 };
+
+template <typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+inline bool operator==(const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& lhs,
+                       const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& rhs)
+{
+    return lhs.size() == rhs.size() && equal(lhs.begin(), lhs.end(), rhs.begin()); 
+}
+
+template <typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+inline bool operator!=(const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& lhs,
+                       const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& rhs)
+{
+    return !(lhs == rhs);
+}
+
+template <typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+inline bool operator<(const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& lhs,
+                      const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& rhs)
+{
+    return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());  
+}
+
+template <typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+inline bool operator>(const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& lhs,
+                      const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& rhs)
+{
+    return rhs < lhs; 
+}
+
+template <typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+inline bool operator<=(const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& lhs,
+                      const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& rhs)
+{
+    return !(rhs < lhs); 
+}
+
+template <typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+inline bool operator>=(const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& lhs,
+                      const RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& rhs)
+{
+    return !(lhs < rhs);
+}
+
+template <typename Key, typename Value, typename KeyOfValue, typename Compare, typename Alloc>
+inline void swap(RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& x,
+                 RedBlackTree<Key, Value, KeyOfValue, Compare, Alloc>& y)
+{
+    x.swap(y);
+}
 
 }
 
