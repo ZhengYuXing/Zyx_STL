@@ -136,6 +136,25 @@ struct logical_not
     bool operator()(const T& x) const { return !x; }
 };
 
+template <typename T>
+struct identity
+{
+    typedef T argument_type;
+    typedef T result_type;
+    const T& operator()(const T& x) const { return x; }
+};
+
+template <typename Pair>
+struct select1st
+{
+    typedef Pair argument_type;
+    typedef typename Pair::first_type result_type;
+    const typename Pair::first_type& operator()(const Pair& x) const 
+    { 
+        return x.first; 
+    }
+};
+
 }
 
 #endif

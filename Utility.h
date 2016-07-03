@@ -62,51 +62,51 @@ struct Pair
 };
 
 template <typename T1, typename T2>
-bool operator==(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
+inline Pair<T1, T2> make_pair(const T1& x, const T2& y)
+{
+    return Pair<T1, T2>(x, y);
+}
+
+template <typename T1, typename T2>
+inline bool operator==(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
 {
     return lhs.first == rhs.first && lhs.second == rhs.second;
 }
 
 template <typename T1, typename T2>
-bool operator!=(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
+inline bool operator!=(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
 {
     return !(lhs == rhs);
 }
 
 template <typename T1, typename T2>
-bool operator<(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
+inline bool operator<(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
 {
     return lhs.first < rhs.first || (!(lhs.first < rhs.first) && lhs.second < rhs.second);
 }
 
 template <typename T1, typename T2>
-bool operator<=(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
+inline bool operator<=(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
 {
     return !(rhs < lhs);
 }
 
 template <typename T1, typename T2>
-bool operator>(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
+inline bool operator>(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
 {
     return rhs < lhs;
 }
 
 template <typename T1, typename T2>
-bool operator>=(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
+inline bool operator>=(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
 {
     return !(lhs < rhs);
 }
 
 template <typename T1, typename T2>
-void swap(Pair<T1, T2>& x, Pair<T1, T2>& y)
+inline void swap(Pair<T1, T2>& x, Pair<T1, T2>& y)
 {
     x.swap(y);
-}
-
-template <typename T1, typename T2>
-Pair<T1, T2> make_pair(const T1& x, const T2& y)
-{
-    return Pair<T1, T2>(x, y);
 }
 
 }

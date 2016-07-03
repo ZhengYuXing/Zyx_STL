@@ -34,7 +34,7 @@ public:
 
     template <typename InputIterator>
     Vector(InputIterator first, InputIterator last) 
-        : start(nullptr), finish(nullptr), end_of_storage(nullptr)
+      : start(nullptr), finish(nullptr), end_of_storage(nullptr)
     {
         while (first != last) {
             push_back(*first);
@@ -72,19 +72,18 @@ public:
     iterator end()  { 	return finish;  }
     const_iterator end() const { return finish; }
 
-    size_type size() const  { return finish - start;  }
-    size_type capacity() const { return end_of_storage - start; }
-
-    bool empty() const { return start == finish; }
-
-    reference operator[](size_type i) { return *(start + i); }
-    const_reference operator[](size_type i) const { return *(start + i); }
-
     reference front() { return *start; }
     const_reference front() const { return *start; }
 
     reference back() { return *(finish - 1); }
     const_reference back() const { return *(finish - 1); }
+
+    reference operator[](size_type i) { return *(start + i); }
+    const_reference operator[](size_type i) const { return *(start + i); }   
+     
+    size_type size() const  { return finish - start;  }
+    size_type capacity() const { return end_of_storage - start; }
+    bool empty() const { return start == finish; }
 
 public:
     void push_back(const T& val)
@@ -283,16 +282,18 @@ private:
 template <typename T, typename Alloc>
 inline bool operator==(const Vector<T, Alloc>& lhs, const Vector<T, Alloc>& rhs)
 {
-    typedef typename Vector<T, Alloc>::const_iterator const_iterator;
-    const_iterator end1 = lhs.end();
-    const_iterator end2 = rhs.end();
-    const_iterator i1 = lhs.begin();
-    const_iterator i2 = rhs.begin();    
-    while (i1 != end1 && i2 != end2 && *i1 == *i1) {
-        ++i1;
-        ++i2;
-    }    
-    return i1 == end1 && i2 == end2;
+    return lhs.size() == rhs.size() && equal(lhs.begin(), lhs.end(), rhs.begin()); 
+
+    // typedef typename Vector<T, Alloc>::const_iterator const_iterator;
+    // const_iterator end1 = lhs.end();
+    // const_iterator end2 = rhs.end();
+    // const_iterator i1 = lhs.begin();
+    // const_iterator i2 = rhs.begin();    
+    // while (i1 != end1 && i2 != end2 && *i1 == *i1) {
+    //     ++i1;
+    //     ++i2;
+    // }    
+    // return i1 == end1 && i2 == end2;
 }
 
 template <typename T, typename Alloc>

@@ -37,7 +37,6 @@ struct __list_iterator
 	__list_iterator() : node(nullptr) { }
 	__list_iterator(link_type x) : node(x) { }
 	__list_iterator(const iterator& x) : node(x.node) { }
-	// __list_iterator(const const_iterator& x) : node(x.node) { }
 
 	bool operator==(const self& x) const { return node == x.node; }
 	bool operator!=(const self& x) const { return node != x.node; }
@@ -126,15 +125,13 @@ public:
 			swap(tmp);
 		}
 		return *this;
-
-		/*
-		if (this != &x) {
-			clear();
-			for (const_iterator iter = x.begin(); iter != x.end(); ++iter)
-				push_back(*iter);
-		}
-		return *this;
-		*/
+		
+		// if (this != &x) {
+		// 	clear();
+		// 	for (const_iterator iter = x.begin(); iter != x.end(); ++iter)
+		// 		push_back(*iter);
+		// }
+		// return *this;		
 	}
 
 	~List() 
@@ -364,8 +361,7 @@ public:
 	}
 
 private:
-	link_type get_node() { return list_node_allocator::allocate(); }
-	
+	link_type get_node() { return list_node_allocator::allocate(); }	
 	void put_node(link_type p) { list_node_allocator::deallocate(p); }
 
 	link_type create_node(const T& x)
@@ -417,16 +413,18 @@ private:
 template <typename T, typename Alloc>
 inline bool operator==(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
 {
-    typedef typename List<T, Alloc>::const_iterator const_iterator;
-    const_iterator end1 = lhs.end();
-    const_iterator end2 = rhs.end();
-    const_iterator i1 = lhs.begin();
-    const_iterator i2 = rhs.begin();    
-    while (i1 != end1 && i2 != end2 && *i1 == *i1) {
-    	++i1;
-    	++i2;
-    }    
-    return i1 == end1 && i2 == end2;
+    return lhs.size() == rhs.size() && equal(lhs.begin(), lhs.end(), rhs.begin()); 
+    	
+    // typedef typename List<T, Alloc>::const_iterator const_iterator;
+    // const_iterator end1 = lhs.end();
+    // const_iterator end2 = rhs.end();
+    // const_iterator i1 = lhs.begin();
+    // const_iterator i2 = rhs.begin();    
+    // while (i1 != end1 && i2 != end2 && *i1 == *i1) {
+    // 	++i1;
+    // 	++i2;
+    // }    
+    // return i1 == end1 && i2 == end2;
 }
 
 template <typename T, typename Alloc>
