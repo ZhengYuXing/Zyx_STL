@@ -35,7 +35,9 @@ struct __deque_iterator
 	map_pointer node;
 
 	__deque_iterator() : cur(nullptr), first(nullptr), last(nullptr), node(nullptr) { }
-	__deque_iterator(const iterator& x) : cur(x.cur), first(x.first), last(x.last), node(x.node) { }
+	
+	__deque_iterator(const iterator& x) 
+	  : cur(x.cur), first(x.first), last(x.last), node(x.node) { }
 
 	static size_type buffer_size() { return __deque_buf_size(BufSiz, sizeof(T)); }
 
@@ -51,7 +53,9 @@ struct __deque_iterator
 
 	difference_type operator-(const self& x) const
 	{
-		return (node - x.node - 1) * difference_type(buffer_size()) + (cur - first) + (x.last - x.cur);
+		return (node - x.node - 1) * difference_type(buffer_size()) 
+		                                             + (cur - first) 
+		                                             + (x.last - x.cur);
 	}
 
 	self& operator++()
@@ -94,8 +98,9 @@ struct __deque_iterator
 		if (offset >= 0 && offset < difference_type(buffer_size())) {
 			cur += n;
 		} else {
-			difference_type node_offset = offset >= 0 ? offset / difference_type(buffer_size()) 
-										  			  : -difference_type((-offset - 1) / buffer_size()) - 1;
+			difference_type node_offset = offset >= 0 
+			                            ? offset / difference_type(buffer_size()) 
+	                                    : -difference_type((-offset - 1) / buffer_size()) - 1;
 			set_node(node + node_offset);
 			cur = first + (offset - node_offset * difference_type(buffer_size()));
 		}
@@ -130,20 +135,6 @@ struct __deque_iterator
 template <typename T, typename Alloc = alloc, size_t BufSiz = 0>
 class Deque
 {
-public:
-	template <typename T, typename Alloc, size_t BufSiz>
-	friend bool operator==(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs);
-	template <typename T, typename Alloc, size_t BufSiz>
-	friend bool operator!=(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs);
-	template <typename T, typename Alloc, size_t BufSiz>
-	friend bool operator<(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs);
-	template <typename T, typename Alloc, size_t BufSiz>
-	friend bool operator<=(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs);
-	template <typename T, typename Alloc, size_t BufSiz>
-	friend bool operator>(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs);			
-	template <typename T, typename Alloc, size_t BufSiz>
-	friend bool operator>=(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc, BufSiz>& rhs);	
-
 public:
 	typedef T 												   value_type;
 	typedef __deque_iterator<T, T&, T*, BufSiz> 			   iterator;

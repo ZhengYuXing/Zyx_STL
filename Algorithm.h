@@ -7,6 +7,17 @@
 
 namespace Zyx {
 
+//------------------------------------【equal() function】------------------------------------
+
+template <typename InputIterator1, typename InputIterator2>
+bool equal(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
+{
+    for (; first1 != last1; ++first1, ++first2)
+        if (!(*first1 == *first2))
+            return false;
+    return true;
+}
+
 //--------------------------【lexicographical_compare() function】----------------------------
 
 template <typename InputIterator1, typename InputIterator2>
@@ -862,7 +873,7 @@ void __random_shuffle(RandomAccessIterator first, RandomAccessIterator last, Dis
     if (first == last)
         return;
     for (RandomAccessIterator i = first + 1; i != last; ++i)
-        iter_swap(i, first + Distance(rand() % (i - first) + 1));
+        iter_swap(i, first + Distance(rand() % ((i - first) + 1)));
 }
 
 template <typename RandomAccessIterator, typename RandomNumberGenerator>
