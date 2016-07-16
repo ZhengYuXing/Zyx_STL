@@ -886,6 +886,27 @@ void random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
         iter_swap(i, first + rand((i - first) + 1));
 }
 
+//---------------------------------【partitional() function】---------------------------------
+
+template <typename BidirectionalIterator, typename Predicate>
+BidirectionalIterator partition(BidirectionalIterator first, 
+                                BidirectionalIterator last, Predicate pred)
+{
+    while (first != last) {
+        while (pred(*first)) {
+            ++first;
+            if (first == last) return first;
+        }
+        do {
+            --last;
+            if (first == last) return first;
+        } while (!pred(*last));
+        iter_swap(first, last);
+        ++first;
+    }
+    return first;
+}
+
 //---------------------------------【partial_sort() function】--------------------------------
 
 template <typename RandomAccessIterator>
