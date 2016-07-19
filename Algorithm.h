@@ -602,6 +602,98 @@ OutputIterator reverse_copy(BidirectionalIterator first, BidirectionalIterator l
     return result;
 }
 
+//---------------------------------【set_union() function】-----------------------------------
+
+template <typename InputIterator1, typename InputIterator2, typename OutputIterator>
+OutputIterator set_union(InputIterator1 first1, InputIterator1 last1, 
+                         InputIterator2 first2, InputIterator2 last2, 
+                         OutputIterator result)
+{
+    while (first1 != last1 && first2 != last2) {
+        if (*first1 < *first2) {
+            *result = *first1;
+            ++first1;
+        } else if (*first2 < *first1) {
+            *result = *first2;
+            ++first2;
+        } else {
+            *result = *first1;
+            ++first1;
+            ++first2;
+        }
+        ++result;
+    }
+    return copy(first2, last2, copy(first1, last1, result));
+}
+
+//------------------------------【set_intersection() function】-------------------------------
+
+template <typename InputIterator1, typename InputIterator2, typename OutputIterator>
+OutputIterator set_intersection(InputIterator1 first1, InputIterator1 last1,
+                                InputIterator2 first2, InputIterator2 last2,
+                                OutputIterator result)
+{
+    while (first1 != last1 && first2 != last2) {
+        if (*first1 < *first2) {
+            ++first1;
+        } else if (*first2 < *first1) {
+            ++first2;
+        } else {
+            *result = *first1;
+            ++first1;
+            ++first2;
+            ++result;
+        }
+    }
+    return result;
+}
+
+//-------------------------------【set_difference() function】--------------------------------
+
+template <typename InputIterator1, typename InputIterator2, typename OutputIterator>
+OutputIterator set_difference(InputIterator1 first1, InputIterator1 last1,
+                              InputIterator2 first2, InputIterator2 last2,
+                              OutputIterator result)
+{
+    while (first1 != last1 && first2 != last2) {
+        if (*first1 < *first2) {
+            *result = *first1;
+            ++first1;
+            ++result;
+        } else if (*first2 < *first1) {
+            ++first2;
+        } else {
+            ++first1;
+            ++first2;
+        }
+    }
+    return copy(first1, last1, result);
+}
+
+//--------------------------【set_symmetric_difference() function】---------------------------
+
+template <typename InputIterator1, typename InputIterator2, typename OutputIterator>
+OutputIterator set_symmetric_difference(InputIterator1 first1, InputIterator1 last1,
+                                        InputIterator2 first2, InputIterator2 last2,
+                                        OutputIterator result)
+{
+    while (first1 != last1 && first2 != last2) {
+        if (*first1 < *first2) {
+            *result = *first1;
+            ++first1;
+            ++result;
+        } else if (*first2 < *first1) {
+            *result = *first2;
+            ++first2;
+            ++result;
+        } else {
+            ++first1;
+            ++first2;
+        }
+    }
+    return copy(first2, last2, copy(first1, last1, result));
+}
+
 //--------------------------------【lower_bound() function】----------------------------------
 
 template <typename ForwardIterator, typename T>
@@ -905,6 +997,29 @@ BidirectionalIterator partition(BidirectionalIterator first,
         ++first;
     }
     return first;
+
+    // another way:
+    // while (true) {
+    //     while (true) {
+    //         if (first == last)
+    //             return first;
+    //         else if (pred(*first))
+    //             ++first;
+    //         else
+    //             break;
+    //     }
+    //     --last;
+    //     while (true) {
+    //         if (first == last)
+    //             return first;
+    //         else if (!pred(*last))
+    //             --last;
+    //         else
+    //             break;
+    //     }
+    //     iter_swap(first, last);
+    //     ++first;
+    // }
 }
 
 //---------------------------------【partial_sort() function】--------------------------------
