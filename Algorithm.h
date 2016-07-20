@@ -694,6 +694,36 @@ OutputIterator set_symmetric_difference(InputIterator1 first1, InputIterator1 la
     return copy(first2, last2, copy(first1, last1, result));
 }
 
+//-----------------------------------【merge() function】-------------------------------------
+
+template <typename InputIterator1, typename InputIterator2, typename OutputIterator>
+OutputIterator merge(InputIterator1 first1, InputIterator1 last1, 
+                     InputIterator2 first2, InputIterator2 last2, 
+                     OutputIterator result)
+{
+    while (first1 != last1 && first2 != last2) {
+        if (*first2 < *first1) {
+            *result = *first2;
+            ++first2;
+            ++result;            
+        } else {
+            *result = *first1;
+            ++first1;
+            ++result;
+        }
+    }
+    return copy(first2, last2, copy(first1, last1, result));    
+}
+
+//-------------------------------【inplace_merge() function】---------------------------------
+
+template <typename BidirectionalIterator>
+void inplace_merge(BidirectionalIterator first, BidirectionalIterator middle, 
+                   BidirectionalIterator last)
+{
+    if ()
+}
+
 //--------------------------------【lower_bound() function】----------------------------------
 
 template <typename ForwardIterator, typename T>
@@ -978,11 +1008,11 @@ void random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
         iter_swap(i, first + rand((i - first) + 1));
 }
 
-//---------------------------------【partitional() function】---------------------------------
+//----------------------------------【partition() function】----------------------------------
 
 template <typename BidirectionalIterator, typename Predicate>
-BidirectionalIterator partition(BidirectionalIterator first, 
-                                BidirectionalIterator last, Predicate pred)
+BidirectionalIterator partition(BidirectionalIterator first, BidirectionalIterator last, 
+                                Predicate pred)
 {
     while (first != last) {
         while (pred(*first)) {
@@ -1020,6 +1050,31 @@ BidirectionalIterator partition(BidirectionalIterator first,
     //     iter_swap(first, last);
     //     ++first;
     // }
+}
+
+//---------------------------------【nth_element() function】---------------------------------
+
+template <typename RandomAccessIterator>
+void nth_element(RandomAccessIterator first, RandomAccessIterator nth, 
+                 RandomAccessIterator last)
+{
+    __nth_element(first, nth, last, value_type(first));
+}
+
+template <typename RandomAccessIterator, typename T>
+void __nth_element(RandomAccessIterator first, RandomAccessIterator nth, 
+                 RandomAccessIterator last, T*)
+{
+    while (last - first > 3) {
+        RandomAccessIterator cut = __unguarded_partition(first, last, T(__median(*first, 
+                                                         *(first + (last - first)/2), 
+                                                         *(last - 1))));
+        if (cut <= nth)
+            first = cut;
+        else
+            last = cut;
+    }
+    __insertion_sort(first, last);
 }
 
 //---------------------------------【partial_sort() function】--------------------------------
@@ -1082,7 +1137,8 @@ void __quick_sort_loop_aux(RandomAccessIterator first, RandomAccessIterator last
 {
     while (last - first > __stl_threshold) {
         RandomAccessIterator cut = __unguarded_partition(first, last, T(__median(*first, 
-                                                         *(first + (last - first)/2), *(last - 1))));
+                                                         *(first + (last - first)/2), 
+                                                         *(last - 1))));
         if (cut - first >= last - cut) {
             __quick_sort_loop(cut, last);
             last = cut;
@@ -1123,7 +1179,8 @@ const T& __median(const T& a, const T& b, const T& c)
 }
 
 template <typename RandomAccessIterator, typename T, typename Size>
-void __introsort_loop(RandomAccessIterator first, RandomAccessIterator last, T*, Size depth_limit)
+void __introsort_loop(RandomAccessIterator first, RandomAccessIterator last, 
+                      T*, Size depth_limit)
 {
     while (last - first > __stl_threshold) {
         if (depth_limit == 0) {
@@ -1132,14 +1189,16 @@ void __introsort_loop(RandomAccessIterator first, RandomAccessIterator last, T*,
         }
         --depth_limit;
         RandomAccessIterator cut = __unguarded_partition(first, last, T(__median(*first, 
-                                                         *(first + (last - first)/2), *(last - 1))));
+                                                         *(first + (last - first)/2), 
+                                                         *(last - 1))));
         __introsort_loop(cut, last, value_type(first), depth_limit);
         last = cut;
     }
 }
 
 template <typename RandomAccessIterator, typename T>
-RandomAccessIterator __unguarded_partition(RandomAccessIterator first, RandomAccessIterator last, T pivot)
+RandomAccessIterator __unguarded_partition(RandomAccessIterator first, 
+                                           RandomAccessIterator last, T pivot)
 {
     while (true) {
         while (*first < pivot) 
