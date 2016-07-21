@@ -144,7 +144,7 @@ public:
     typedef const T*                                           const_pointer;
     typedef T&                                                 reference;
     typedef const T&                                           const_reference;
-    typedef size_t 	                                           size_type;
+    typedef size_t                                             size_type;
     typedef ptrdiff_t                                          difference_type;
 
 private:
@@ -476,13 +476,13 @@ inline bool operator==(const Deque<T, Alloc, BufSiz>& lhs, const Deque<T, Alloc,
     }    
     return i1 == end1 && i2 == end2;
 
-	// if (lhs.size() != rhs.size())
-	// 	return false;
-	
-	// for (Deque<T, Alloc, BufSiz>::size_type i = 0; i < lhs.size(); i++)
-	// 	if (lhs[i] != rhs[i])
-	// 		return false;
-	// return true;
+    // if (lhs.size() != rhs.size())
+    //     return false;
+    
+    // for (Deque<T, Alloc, BufSiz>::size_type i = 0; i < lhs.size(); i++)
+    //     if (lhs[i] != rhs[i])
+    //         return false;
+    // return true;
 }
 
 template <typename T, typename Alloc>
