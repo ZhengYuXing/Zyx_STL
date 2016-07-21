@@ -99,7 +99,7 @@ struct __deque_iterator
         if (offset >= 0 && offset < difference_type(buffer_size())) {
             cur += n;
         } else {
-        	difference_type node_offset = offset >= 0 
+            difference_type node_offset = offset >= 0 
                                         ? offset / difference_type(buffer_size()) 
                                         : -difference_type((-offset - 1) / buffer_size()) - 1;
             set_node(node + node_offset);
