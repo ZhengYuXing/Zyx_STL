@@ -123,7 +123,7 @@ public:
     HashTable(const HashTable& ht) 
       : hash(ht.hash), equals(ht.equals), get_key(ht.get_key), num_elements(0)
     {
-        
+
     }
 
 public:
@@ -279,8 +279,8 @@ private:
     hasher hash;
     key_equal equals;
     ExtractKey get_key;    
-	Vector<node*, Alloc> buckets;
-	size_type num_elements;
+    Vector<node*, Alloc> buckets;
+    size_type num_elements;
 };
 
 }
