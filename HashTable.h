@@ -25,7 +25,7 @@ template <typename Value, typename Key, typename HashFcn,
           typename ExtractKey, typename EqualKey, typename Alloc>
 struct __hashtable_iterator
 {
-	typedef HashTable<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc> hashtable;
+    typedef HashTable<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc> hashtable;
     typedef __hashtable_iterator<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc> iterator;
     typedef __hashtable_node<Value> node;
 
@@ -110,7 +110,7 @@ public:
     typedef __hashtable_iterator<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc> iterator;
 
 private:
-	typedef __hashtable_node<Value> node;
+    typedef __hashtable_node<Value> node;
     typedef simple_alloc<node, Alloc> node_allocator;
 
 public:
