@@ -363,25 +363,25 @@ private:
                 //     copy(first, mid, pos);
                 // }
             } else {
-            const size_type old_size = size();
-            const size_type len = old_size + max(old_size, n);
-            iterator new_start = allocate(len);
-            iterator new_finish = new_start;
-            try {
-                new_finish = uninitialized_copy(start, pos, new_start);
-                new_finish = uninitialized_copy(first, last, new_finish);
-                new_finish = uninitialized_copy(pos, finish, new_finish);
-            } catch(...) {
-                destroy(new_start, new_finish);
-                deallocate(new_start, len);
-                throw;
-            }
-            destroy(start, finish);
-            deallocate(start, end_of_storage - start);
-            start = new_start;
-            finish = new_finish;
-            end_of_storage = start + len;
-        }            
+                const size_type old_size = size();
+                const size_type len = old_size + max(old_size, n);
+                iterator new_start = allocate(len);
+                iterator new_finish = new_start;
+                try {
+                    new_finish = uninitialized_copy(start, pos, new_start);
+                    new_finish = uninitialized_copy(first, last, new_finish);
+                    new_finish = uninitialized_copy(pos, finish, new_finish);
+                } catch(...) {
+                    destroy(new_start, new_finish);
+                    deallocate(new_start, len);
+                    throw;
+                }
+                destroy(start, finish);
+                deallocate(start, end_of_storage - start);
+                start = new_start;
+                finish = new_finish;
+                end_of_storage = start + len;
+            }            
         }
     }
 
