@@ -1,6 +1,7 @@
 #ifndef ZYX_VECTOR
 #define ZYX_VECTOR 
 
+#include "Iterator.h"
 #include "Alloc.h"
 #include "Construct.h"
 #include "Algorithm.h"
@@ -28,26 +29,39 @@ private:
 public:
     Vector() : start(nullptr), finish(nullptr), end_of_storage(nullptr) { }
 
-    Vector(size_type n, const T& val) { fill_initialize(n, val); }
+    Vector(size_type n, const T& val) 
+      : start(nullptr), finish(nullptr), end_of_storage(nullptr)
+    {
+        start = allocate(n);
+        finish = uninitialized_fill_n(start, n, val);
+        end_of_storage = start + n;
+    }
 
-    explicit Vector(size_type n) { fill_initialize(n, T()); }
+    explicit Vector(size_type n) 
+      : start(nullptr), finish(nullptr), end_of_storage(nullptr)
+    {
+        start = allocate(n);
+        finish = uninitialized_fill_n(start, n, T());
+        end_of_storage = start + n;       
+    }
 
     template <typename InputIterator>
     Vector(InputIterator first, InputIterator last) 
       : start(nullptr), finish(nullptr), end_of_storage(nullptr)
     {
-        while (first != last) {
-            push_back(*first);
-            ++first;
-        }
-
-        
+        const size_type n = distance(first, last);
+        start = allocate(n);
+        finish = uninitialized_copy(first, last, start);
+        end_of_storage = start + n;        
     }
 
-    Vector(const Vector& x) : start(nullptr), finish(nullptr), end_of_storage(nullptr)
+    Vector(const Vector& x) 
+      : start(nullptr), finish(nullptr), end_of_storage(nullptr)
     {
-        for (const_iterator iter = x.begin(); iter != x.end(); ++iter)
-            push_back(*iter);
+        const size_type n = x.size();
+        start = allocate(n);
+        finish = uninitialized_copy(x.begin(), x.end(), start);
+        end_of_storage = start + n;
     }
 
     Vector& operator=(const Vector& x)
@@ -57,24 +71,42 @@ public:
             swap(tmp);
         }
         return *this;
+
+        // another way:
+        // if (this != &x) {
+        //     const size_type n = x.size();
+        //     if (n > capacity()) {
+        //         iterator tmp = allocate_and_copy(n, x.begin(), x.end());
+        //         destroy(start, finish);
+        //         deallocate(start, end_of_storage - start);
+        //         start = tmp;
+        //         end_of_storage = start + n;
+        //     } else if (size() >= n) {
+        //         iterator tmp = copy(x.begin(), x.end(), start);
+        //         destroy(tmp, finish);
+        //     } else {
+        //         copy(x.begin(), x.begin() + size(), start);
+        //         uninitialized_copy(x.begin() + size(), x.end(), finish);
+        //     }
+        //     finish = start + n;
+        // }
+        // return *this;
     }
 
     ~Vector()
     {
         destroy(start, finish);
-        deallocate();
+        deallocate(start, end_of_storage - start);
     }
 
 public:
     iterator begin()  { return start;  }
     const_iterator begin() const { return start; }
-
     iterator end()  { 	return finish;  }
     const_iterator end() const { return finish; }
 
     reference front() { return *start; }
     const_reference front() const { return *start; }
-
     reference back() { return *(finish - 1); }
     const_reference back() const { return *(finish - 1); }
 
@@ -82,6 +114,7 @@ public:
     const_reference operator[](size_type i) const { return *(start + i); }   
      
     size_type size() const  { return finish - start;  }
+    size_type max_size() const { return size_type(-1) / sizeof(T); }
     size_type capacity() const { return end_of_storage - start; }
     bool empty() const { return start == finish; }
 
@@ -104,56 +137,26 @@ public:
 
     iterator insert(iterator pos, const T& val)
     {
-        return insert_aux(pos, val);
-    }
-
-    void insert(iterator pos, size_type n, const T& val)
-    {
-        if (n != 0) {
-            if (end_of_storage - finish >= n) {
-                const size_type elems_after = finish - pos; 
-                iterator old_finish = finish;
-                if (elems_after > n) {
-                    uninitialized_copy(finish - n, finish, finish);
-                    finish += n;
-                    copy_backward(pos, old_finish - n, old_finish);
-                    fill(pos, pos + n, val);
-                } else {
-                    uninitialized_fill_n(finish, n - elems_after, val);
-                    finish += n - elems_after;
-                    uninitialized_copy(pos, old_finish, finish);
-                    finish += elems_after;
-                    fill(pos, old_finish, val);
-                }
-            } else {
-                const size_type old_size = size();
-                const size_type len = old_size + max(old_size, n);
-
-                iterator new_start = data_allocator::allocate(len);
-                iterator new_finish = new_start;
-
-                try {
-                    new_finish = uninitialized_copy(start, pos, new_start);
-                    new_finish = uninitialized_fill_n(new_finish, n, val);
-                    new_finish = uninitialized_copy(pos, finish, new_finish);
-                } catch (...) {
-                    destroy(new_start, new_finish);
-                    data_allocator::deallocate(new_start, len);
-                    throw;
-                }
-
-                destroy(start, finish);
-                deallocate();
-
-                start = new_start;
-                finish = new_finish;
-                end_of_storage = new_start + len;
-            }
+        const size_type n = pos - start;
+        if (pos == finish && finish != end_of_storage) {
+            construct(finish, val);
+            ++finish;
+        } else {
+            insert_aux(finish, val);
         }
+        return start + n;
     }
 
-    //template <typename InputIterator>
-    //void insert(iterator pos, InputIterator first, InputIterator last)
+    void insert(iterator pos, size_type n, const T& val) 
+    { 
+        fill_insert(pos, n, val); 
+    }
+
+    template <typename InputIterator>
+    void insert(iterator pos, InputIterator first, InputIterator last)
+    {
+        range_insert(pos, first, last);
+    }
 
     template <typename InputIterator>
     void assign(InputIterator first, InputIterator last)
@@ -166,8 +169,8 @@ public:
             finish = result;
         } else {
             destroy(start, finish);
-            deallocate();            
-            start = data_allocator::allocate(n);
+            deallocate(start, end_of_storage - start);            
+            start = allocate(n);
             finish = uninitialized_copy(first, last, start);
             end_of_storage = start + n;            
         }
@@ -182,8 +185,8 @@ public:
             finish = result;
         } else {
             destroy(start, finish);
-            deallocate();
-            start = data_allocator::allocate(n);
+            deallocate(start, end_of_storage - start);
+            start = allocate(n);
             finish = uninitialized_fill_n(start, n, val);
             end_of_storage = start + n;
         }
@@ -206,6 +209,29 @@ public:
         return first;
     }
 
+    void resize(size_type n, const T& val)
+    {
+        if (n < size())
+            erase(start + n, finish);
+        else
+            insert(finish, n - size(), val);
+    }
+
+    void resize(size_type n) { resize(n, T()); }
+
+    void reserve(size_type n)
+    {
+        if (capacity() < n) {
+            const size_type old_size = size();
+            iterator tmp = allocate_and_copy(n, start, finish);
+            destroy(start, finish);
+            deallocate(start, end_of_storage - start);
+            start = tmp;
+            finish = start + old_size;
+            end_of_storage = start + n;
+        }
+    }
+
     void clear() { erase(start, finish); }
 
     void swap(Vector& x)
@@ -216,41 +242,28 @@ public:
     }
 
 private:
-    void fill_initialize(size_type n, const T& val)
-    {
-        start = allocate_and_fill(n, val);
-        finish = start + n;
-        end_of_storage = finish;
-    }
+    iterator allocate(size_type n) { return data_allocator::allocate(n); }
+    void deallocate(iterator p, size_type n) { data_allocator::deallocate(p, n); }
 
-    iterator allocate_and_fill(size_type n, const T& val)
+    template <typename ForwardIterator>
+    iterator allocate_and_copy(size_type n, ForwardIterator first, ForwardIterator last)
     {
-        iterator result = data_allocator::allocate(n);
-        uninitialized_fill_n(result, n, val);
+        iterator result = allocate(n);
+        uninitialized_copy(first, last, result);
         return result;
     }
 
-    void deallocate()
-    {
-        if (start)
-            data_allocator::deallocate(start, end_of_storage - start);
-    }
-
-    iterator insert_aux(iterator pos, const T& val)
+    void insert_aux(iterator pos, const T& val)
     {
         if (finish != end_of_storage) {
             ++finish;
             copy_backward(pos, finish - 1, finish);
             *pos = val;
-            return pos;
         } else {
-            const size_type count = pos - start;
             const size_type old_size = size();
             const size_type len = old_size != 0 ? 2 * old_size : 1;
-
-            iterator new_start = data_allocator::allocate(len);
+            iterator new_start = allocate(len);
             iterator new_finish = new_start;
-
             try {
                 new_finish = uninitialized_copy(start, pos, new_start);
                 construct(new_finish, val);
@@ -258,18 +271,117 @@ private:
                 new_finish = uninitialized_copy(pos, finish, new_finish);
             } catch (...) {
                 destroy(new_start, new_finish);
-                data_allocator::deallocate(new_start, len);
+                deallocate(new_start, len);
                 throw;
             }
-
             destroy(start, finish);
-            deallocate();
-
+            deallocate(start, end_of_storage - start);
             start = new_start;
             finish = new_finish;
             end_of_storage = new_start + len;
+        }
+    }
 
-            return start + count;
+    void fill_insert(iterator pos, size_type n, const T& val)
+    {
+        if (n != 0) {
+            if (end_of_storage - finish >= n) {
+                finish += n;
+                copy_backward(pos, finish - n, finish);
+                fill(pos, pos + n, val);
+
+                // const size_type elems_after = finish - pos; 
+                // iterator old_finish = finish;
+                // if (elems_after > n) {
+                //     uninitialized_copy(finish - n, finish, finish);
+                //     finish += n;
+                //     copy_backward(pos, old_finish - n, old_finish);
+                //     fill(pos, pos + n, val);
+                // } else {
+                //     uninitialized_fill_n(finish, n - elems_after, val);
+                //     finish += n - elems_after;
+                //     uninitialized_copy(pos, old_finish, finish);
+                //     finish += elems_after;
+                //     fill(pos, old_finish, val);
+                // }
+            } else {
+                const size_type old_size = size();
+                const size_type len = old_size + max(old_size, n);
+                iterator new_start = allocate(len);
+                iterator new_finish = new_start;
+                try {
+                    new_finish = uninitialized_copy(start, pos, new_start);
+                    new_finish = uninitialized_fill_n(new_finish, n, val);
+                    new_finish = uninitialized_copy(pos, finish, new_finish);
+                } catch (...) {
+                    destroy(new_start, new_finish);
+                    deallocate(new_start, len);
+                    throw;
+                }
+                destroy(start, finish);
+                deallocate(start, end_of_storage - start);
+                start = new_start;
+                finish = new_finish;
+                end_of_storage = new_start + len;
+            }
+        }
+    }
+
+    // template <typename InputIterator>
+    // void range_insert(iterator pos, InputIterator first, InputIterator last)
+    // {
+    //     for (; first != last; ++first) {
+    //         pos = insert(pos, *first);
+    //         ++pos;
+    //     }
+    // }
+
+    template <typename ForwardIterator>
+    void range_insert(iterator pos, ForwardIterator first, ForwardIterator last)
+    {
+        if (first != last) {
+            size_type n = distance(first, last);
+            if (end_of_storage - finish >= n) {
+                finish += n;
+                copy_backward(pos, finish - n, finish);
+                copy(first, last, pos);
+
+                // const size_type elems_after = finish - pos;
+                // iterator old_finish = finish;
+                // if (elems_after > n) {
+                //     uninitialized_copy(finish - n, finish, finish);
+                //     finish += n;
+                //     copy_backward(pos, old_finish - n, old_finish);
+                //     copy(first, last, pos);
+                // } else {
+                //     iterator mid = first;
+                //     advance(mid, elems_after);
+                //     uninitialized_copy(mid, last, finish);
+                //     finish += n - elems_after;
+                //     uninitialized_copy(pos, old_finish, finish);
+                //     finish += elems_after;
+                //     copy(first, mid, pos);
+                // }
+            } else {
+            const size_type old_size = size();
+            const size_type len = old_size + max(old_size, n);
+            iterator new_start = allocate(len);
+            iterator new_finish = new_start;
+            try {
+                new_finish = uninitialized_copy(start, pos, new_start);
+                new_finish = uninitialized_copy(first, last, new_finish);
+                new_finish = uninitialized_copy(pos, finish, new_finish);
+            } catch(...) {
+                destroy(new_start, new_finish);
+                deallocate(new_start, len);
+                throw;
+            }
+            destroy(start, finish);
+            deallocate(start, end_of_storage - start);
+            start = new_start;
+            finish = new_finish;
+            end_of_storage = start + len;
+        }            
         }
     }
 
