@@ -286,24 +286,20 @@ private:
     {
         if (n != 0) {
             if (end_of_storage - finish >= n) {
-                finish += n;
-                copy_backward(pos, finish - n, finish);
-                fill(pos, pos + n, val);
-
-                // const size_type elems_after = finish - pos; 
-                // iterator old_finish = finish;
-                // if (elems_after > n) {
-                //     uninitialized_copy(finish - n, finish, finish);
-                //     finish += n;
-                //     copy_backward(pos, old_finish - n, old_finish);
-                //     fill(pos, pos + n, val);
-                // } else {
-                //     uninitialized_fill_n(finish, n - elems_after, val);
-                //     finish += n - elems_after;
-                //     uninitialized_copy(pos, old_finish, finish);
-                //     finish += elems_after;
-                //     fill(pos, old_finish, val);
-                // }
+                const size_type elems_after = finish - pos; 
+                iterator old_finish = finish;
+                if (elems_after > n) {
+                    uninitialized_copy(finish - n, finish, finish);
+                    finish += n;
+                    copy_backward(pos, old_finish - n, old_finish);
+                    fill(pos, pos + n, val);
+                } else {
+                    uninitialized_fill_n(finish, n - elems_after, val);
+                    finish += n - elems_after;
+                    uninitialized_copy(pos, old_finish, finish);
+                    finish += elems_after;
+                    fill(pos, old_finish, val);
+                }
             } else {
                 const size_type old_size = size();
                 const size_type len = old_size + max(old_size, n);
@@ -342,26 +338,22 @@ private:
         if (first != last) {
             size_type n = distance(first, last);
             if (end_of_storage - finish >= n) {
-                finish += n;
-                copy_backward(pos, finish - n, finish);
-                copy(first, last, pos);
-
-                // const size_type elems_after = finish - pos;
-                // iterator old_finish = finish;
-                // if (elems_after > n) {
-                //     uninitialized_copy(finish - n, finish, finish);
-                //     finish += n;
-                //     copy_backward(pos, old_finish - n, old_finish);
-                //     copy(first, last, pos);
-                // } else {
-                //     iterator mid = first;
-                //     advance(mid, elems_after);
-                //     uninitialized_copy(mid, last, finish);
-                //     finish += n - elems_after;
-                //     uninitialized_copy(pos, old_finish, finish);
-                //     finish += elems_after;
-                //     copy(first, mid, pos);
-                // }
+                const size_type elems_after = finish - pos;
+                iterator old_finish = finish;
+                if (elems_after > n) {
+                    uninitialized_copy(finish - n, finish, finish);
+                    finish += n;
+                    copy_backward(pos, old_finish - n, old_finish);
+                    copy(first, last, pos);
+                } else {
+                    iterator mid = first;
+                    advance(mid, elems_after);
+                    uninitialized_copy(mid, last, finish);
+                    finish += n - elems_after;
+                    uninitialized_copy(pos, old_finish, finish);
+                    finish += elems_after;
+                    copy(first, mid, pos);
+                }
             } else {
                 const size_type old_size = size();
                 const size_type len = old_size + max(old_size, n);
