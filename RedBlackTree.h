@@ -103,7 +103,7 @@ struct __rb_tree_iterator : public __rb_tree_base_iterator
     typedef Ptr                                          pointer;
     typedef Ref                                          reference;
 
-    __rb_tree_iterator() { }
+    __rb_tree_iterator() : node(nullptr) { }
     __rb_tree_iterator(link_type x) { node = x; } // ????
     __rb_tree_iterator(const iterator& x) { node = x.node; } // ????
 
@@ -161,8 +161,10 @@ public:
     typedef ptrdiff_t            difference_type;
     typedef rb_tree_node*        link_type;
 
-    typedef __rb_tree_iterator<value_type, reference, pointer> iterator;
-    typedef __rb_tree_iterator<value_type, const_reference, const_pointer> const_iterator;
+    typedef __rb_tree_iterator<value_type, reference, pointer> 
+            iterator;
+    typedef __rb_tree_iterator<value_type, const_reference, const_pointer> 
+            const_iterator;
 
 public:
     RedBlackTree(const Compare& comp = Compare()) 
@@ -177,8 +179,8 @@ public:
             header = get_node();
             color(header) = __rb_tree_red;
             root() = __copy(x.root(), header);
-            leftmost() = minimum(root());  // ????
-            rightmost() = maximum(root()); // ????
+            leftmost() = minimum(root());
+            rightmost() = maximum(root());
         }        
     }
 
@@ -557,6 +559,78 @@ private:
             }
         }
         root->color = __rb_tree_black;
+    }
+
+    base_ptr __rb_tree_rebalance_for_erase(base_ptr z, base_ptr& root, 
+                                           base_ptr& leftmost, base_ptr& rightmost)
+    {
+        base_ptr y = z;
+        base_ptr x = nullptr;
+        base_ptr x_parent = nullptr;
+
+        if (y->left == nullptr) {
+            x = y->right;
+        } else {
+            if (y->right == nullptr) {
+                x = y->left;
+            } else {
+                y = y->right;
+                while (y->left != nullptr)
+                    y = y->left;
+                x = y->right;
+            }
+        }
+
+        if (y != z) {
+            z->left->parent = y;
+            y->left = z->left;
+            if (z->right != y) {
+                x_parent = y->parent;
+                if (x != nullptr) x->parent = x_parent;
+                x_parent->left = x;
+                y->right = z->right;
+                z->right->parent = y;
+            } else {
+                x_parent = y;
+            }
+
+            if (root == z) 
+                root = y;
+            else if (z->parent->left == z) 
+                z->parent->left = y;
+            else
+                z->parent->right = y;
+            y->parent = z->parent;
+            Zyx::swap(y->color, z->color);
+            y = z;
+        } else {
+            x_parent = y->parent;
+            if (x != nullptr) x->parent = y->parent;
+            if (root == z)
+                root = x;
+            else if (z->parent->left == z)
+                z->parent->left = x;
+            else
+                z->parent->right = x;
+
+            if (z == leftmost) {
+                if (z->right == nullptr)
+                    leftmost = z->parent;
+                else
+                    leftmost = __rb_tree_node_base::minimum(x);
+            }
+
+            if (z == rightmost) {
+                if (z->left == nullptr)
+                    rightmost = z->parent;
+                else
+                    rightmost = __rb_tree_node_base::maximum(x);
+            }
+        }
+
+        if (y->color == __rb_tree_black) {
+            
+        }
     }
 
 private:
