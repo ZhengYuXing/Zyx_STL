@@ -38,12 +38,12 @@ public:
     void push(const T& val) 
     {
         c.push_back(val);
-        push_heap(c.begin(), c.end());
+        push_heap(c.begin(), c.end(), comp);
     }
 
     void pop()
     {
-        pop_heap(c.begin(), c.end());
+        pop_heap(c.begin(), c.end(), comp);
         c.pop_back();
     }
 
