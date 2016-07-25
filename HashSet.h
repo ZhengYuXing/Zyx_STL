@@ -21,10 +21,10 @@ private:
     typedef HashTable<Value, Value, HashFcn, identity<Value>, EqualKey, Alloc> ht;
 
 public:
-	typedef typename ht::key_type           key_type;
-	typedef typename ht::value_type         value_type;
-	typedef typename ht::hasher             hasher;
-	typedef typename ht::key_equal          key_equal;
+    typedef typename ht::key_type           key_type;
+    typedef typename ht::value_type         value_type;
+    typedef typename ht::hasher             hasher;
+    typedef typename ht::key_equal          key_equal;
 
     typedef typename ht::const_pointer      pointer;
     typedef typename ht::const_pointer      const_pointer;
@@ -32,8 +32,8 @@ public:
     typedef typename ht::const_reference    const_reference;
     typedef typename ht::const_iterator     iterator;
     typedef typename ht::const_iterator     const_iterator;
-	typedef typename ht::size_type          size_type;
-	typedef typename ht::difference_type    difference_type;
+    typedef typename ht::size_type          size_type;
+    typedef typename ht::difference_type    difference_type;
 
 public:
     HashSet() : rep(100, hasher(), key_equal()) { }	
@@ -161,10 +161,10 @@ private:
     typedef HashTable<Value, Value, HashFcn, identity<Value>, EqualKey, Alloc> ht;
 
 public:
-	typedef typename ht::key_type           key_type;
-	typedef typename ht::value_type         value_type;
-	typedef typename ht::hasher             hasher;
-	typedef typename ht::key_equal          key_equal;
+    typedef typename ht::key_type           key_type;
+    typedef typename ht::value_type         value_type;
+    typedef typename ht::hasher             hasher;
+    typedef typename ht::key_equal          key_equal;
 
     typedef typename ht::const_pointer      pointer;
     typedef typename ht::const_pointer      const_pointer;
@@ -172,8 +172,8 @@ public:
     typedef typename ht::const_reference    const_reference;
     typedef typename ht::const_iterator     iterator;
     typedef typename ht::const_iterator     const_iterator;
-	typedef typename ht::size_type          size_type;
-	typedef typename ht::difference_type    difference_type;
+    typedef typename ht::size_type          size_type;
+    typedef typename ht::difference_type    difference_type;
 
 public:
     HashMultiSet() : rep(100, hasher(), key_equal()) { }	
