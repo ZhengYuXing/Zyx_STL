@@ -9,6 +9,8 @@
 
 namespace Zyx {
 
+//-------------------------------------【HashMap class】--------------------------------------
+
 template <typename Key, typename T, typename HashFcn = hash<Key>, 
           typename EqualKey = equal_to<Key>, typename Alloc = alloc>
 class HashMap
