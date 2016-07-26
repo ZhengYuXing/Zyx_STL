@@ -165,6 +165,32 @@ Function for_each(InputIterator first, InputIterator last, Function fn)
     return fn;
 }
 
+//------------------------------------【count() function】------------------------------------
+
+template <typename InputIterator, typename T>
+typename iterator_traits<InputIterator>::difference_type
+count(InputIterator first, InputIterator last, const T& val)
+{
+    typename iterator_traits<InputIterator>::difference_type n = 0;
+    for (; first != last; ++first)
+        if (*first == val)
+            ++n;
+    return n;
+}
+
+//-----------------------------------【count_if() function】----------------------------------
+
+template <typename InputIterator, typename Predicate>
+typename iterator_traits<InputIterator>::difference_type
+count_if(InputIterator first, InputIterator last, Predicate pred)
+{
+    typename iterator_traits<InputIterator>::difference_type n = 0;
+    for (; first != last; ++first)
+        if (pred(*first))
+            ++n;
+    return n;
+}
+
 //-------------------------------------【find() function】------------------------------------
 
 template <typename InputIterator, typename T>
