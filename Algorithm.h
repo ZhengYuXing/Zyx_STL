@@ -390,6 +390,22 @@ OutputIterator copy(InputIterator first, InputIterator last, OutputIterator resu
     return result;
 }
 
+//------------------------------------【copy_if() function】----------------------------------
+
+template <typename InputIterator, typename OutputIterator, typename UnaryPredicate>
+OutputIterator copy_if(InputIterator first, InputIterator last, 
+                       OutputIterator result, UnaryPredicate pred)
+{
+    while (first != last) {
+        if (pred(*first)) {
+            *result = *first;
+            ++result;
+        }
+        ++first;
+    }
+    return result;
+}
+
 //---------------------------------【copy_backward() function】-------------------------------
 
 template <typename BidirectionalIterator1, typename BidirectionalIterator2>
@@ -487,6 +503,50 @@ OutputIterator remove_copy_if(InputIterator first, InputIterator last,
         }
         ++first;
     }
+    return result;
+}
+
+//----------------------------------【replace() function】------------------------------------
+
+template <typename ForwardIterator, typename T>
+void replace(ForwardIterator first, ForwardIterator last, 
+             const T& old_value, const T& new_value)
+{
+    for (; first != last; ++first)
+        if (*first == old_value)
+            *first = new_value;
+}
+
+//---------------------------------【replace_if() function】----------------------------------
+
+template <typename ForwardIterator, typename Predicate, typename T>
+void replace_if(ForwardIterator first, ForwardIterator last, 
+                Predicate pred, const T& new_value)
+{
+    for (; first != last; ++first)
+        if (pred(*first))
+            *first = new_value;    
+}
+
+//--------------------------------【replace_copy() function】---------------------------------
+
+template <typename InputIterator, typename OutputIterator, typename T>
+OutputIterator replace_copy(InputIterator first, InputIterator last, OutputIterator result,
+                            const T& old_value, const T& new_value)
+{
+    for (; first != last; ++first, ++result)
+        *result = (*first == old_value) ? new_value : *first;
+    return result;
+}
+
+//-------------------------------【replace_copy_if() function】-------------------------------
+
+template <typename InputIterator, typename OutputIterator, typename Predicate, typename T>
+OutputIterator replace_copy_if(InputIterator first, InputIterator last, OutputIterator result,
+                               Predicate pred, const T& new_value)
+{
+    for (; first != last; ++first, ++result)
+        *result = pred(*first) ? new_value : *first;
     return result;
 }
 
