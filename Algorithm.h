@@ -7,57 +7,6 @@
 
 namespace Zyx {
 
-//------------------------------------【equal() function】------------------------------------
-
-template <typename InputIterator1, typename InputIterator2>
-bool equal(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
-{
-    for (; first1 != last1; ++first1, ++first2)
-        if (!(*first1 == *first2))
-            return false;
-    return true;
-}
-
-//--------------------------【lexicographical_compare() function】----------------------------
-
-template <typename InputIterator1, typename InputIterator2>
-bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1, 
-                             InputIterator2 first2, InputIterator2 last2)
-{
-    for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
-        if (*first1 < *first2)
-            return true;
-        if (*first2 < *first1)
-            return false;        
-    }
-    return first1 == last1 && first2 != last2;
-}
-
-template <typename InputIterator1, typename InputIterator2, typename Compare>
-bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1, 
-                             InputIterator2 first2, InputIterator2 last2, Compare comp)
-{
-    for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
-        if (comp(*first1, *first2))
-            return true;
-        if (comp(*first2, *first1))
-            return false;        
-    }
-    return first1 == last1 && first2 != last2;
-}
-
-//----------------------------------【for_each() function】-----------------------------------
-
-template <typename InputIterator, typename Function>
-Function for_each(InputIterator first, InputIterator last, Function fn)
-{
-    while (first != last) {
-        fn(*first);
-        ++first;
-    }
-    return fn;
-}
-
 //-------------------------------------【max() function】-------------------------------------
 
 template <typename T>
@@ -128,6 +77,92 @@ ForwardIterator min_element(ForwardIterator first, ForwardIterator last, Compare
         if (comp(*first, *smallest))
             smallest = first;
     return smallest;
+}
+
+//------------------------------------【equal() function】------------------------------------
+
+template <typename InputIterator1, typename InputIterator2>
+bool equal(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
+{
+    for (; first1 != last1; ++first1, ++first2)
+        if (!(*first1 == *first2))
+            return false;
+    return true;
+}
+
+template <typename InputIterator1, typename InputIterator2, typename BinaryPredicate>
+bool equal(InputIterator1 first1, InputIterator1 last1, 
+           InputIterator2 first2, BinaryPredicate pred)
+{
+    for (; first1 != last1; ++first1, ++first2)
+        if (!pred(*first1, *first2))
+            return false;
+    return true;
+}
+
+//--------------------------【lexicographical_compare() function】----------------------------
+
+template <typename InputIterator1, typename InputIterator2>
+bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1, 
+                             InputIterator2 first2, InputIterator2 last2)
+{
+    for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
+        if (*first1 < *first2)
+            return true;
+        if (*first2 < *first1)
+            return false;        
+    }
+    return first1 == last1 && first2 != last2;
+}
+
+template <typename InputIterator1, typename InputIterator2, typename Compare>
+bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1, 
+                             InputIterator2 first2, InputIterator2 last2, Compare comp)
+{
+    for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
+        if (comp(*first1, *first2))
+            return true;
+        if (comp(*first2, *first1))
+            return false;        
+    }
+    return first1 == last1 && first2 != last2;
+}
+
+//----------------------------------【mismatch() function】-----------------------------------
+
+template <typename InputIterator1, typename InputIterator2>
+Pair<InputIterator1, InputIterator2> 
+mismatch(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
+{
+    while (first1 != last1 && *first1 == *first2) {
+        ++first1;
+        ++first2;
+    }
+    return make_pair(first1, first2);
+}
+
+template <typename InputIterator1, typename InputIterator2, typename BinaryPredicate>
+Pair<InputIterator1, InputIterator2> 
+mismatch(InputIterator1 first1, InputIterator1 last1, 
+         InputIterator2 first2, BinaryPredicate pred)
+{
+    while (first1 != last1 && pred(*first1, *first2)) {
+        ++first1;
+        ++first2;
+    }
+    return make_pair(first1, first2);
+}
+
+//----------------------------------【for_each() function】-----------------------------------
+
+template <typename InputIterator, typename Function>
+Function for_each(InputIterator first, InputIterator last, Function fn)
+{
+    while (first != last) {
+        fn(*first);
+        ++first;
+    }
+    return fn;
 }
 
 //-------------------------------------【find() function】------------------------------------
@@ -1197,8 +1232,8 @@ void __introsort_loop(RandomAccessIterator first, RandomAccessIterator last,
 }
 
 template <typename RandomAccessIterator, typename T>
-RandomAccessIterator __unguarded_partition(RandomAccessIterator first, 
-                                           RandomAccessIterator last, T pivot)
+RandomAccessIterator 
+__unguarded_partition(RandomAccessIterator first, RandomAccessIterator last, T pivot)
 {
     while (true) {
         while (*first < pivot) 
