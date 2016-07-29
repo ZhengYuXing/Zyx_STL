@@ -114,6 +114,8 @@ OutputIterator adjacent_difference(InputIterator first, InputIterator last,
     return result;
 }
 
+//-----------------------------------【power() function】--------------------------------------
+
 template <typename T, typename Integer>
 T power(T x, Integer n)
 {
