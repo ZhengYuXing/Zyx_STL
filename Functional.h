@@ -155,6 +155,29 @@ struct select1st
     }
 };
 
+template <typename Pair>
+struct select2nd
+{
+    typedef Pair argument_type;
+    typedef typename Pair::second_type result_type;
+    const typename Pair::second_type& operator()(const Pair& x) const 
+    { 
+        return x.second; 
+    }
+};
+
+template <typename T>
+inline T identity_element(plus<T>)
+{
+    return T(0);
+}
+
+template <typename T>
+inline T identity_element(multiplies<T>)
+{
+    return T(1);
+}
+
 }
 
 #endif
