@@ -129,6 +129,110 @@ void __advance(RandomAccessIterator& iter, Distance n, random_access_iterator_ta
     iter += n;
 }
 
+
+template <typename Container>
+class back_insert_iterator
+{
+public:
+    typedef output_iterator_tag iterator_category;
+    typedef void value_type;
+    typedef void difference_type;
+    typedef void pointer;
+    typedef void reference;
+
+public:
+    explicit back_insert_iterator(Container& x) : container(&x) { }
+
+    back_insert_iterator& operator=(const typename Container::value_type& val)
+    {
+        container->push_back(val);
+        return *this;
+    }
+
+    back_insert_iterator& operator*() { return *this; }
+    back_insert_iterator& operator++() { return *this; }
+    back_insert_iterator& operator++(int) { return *this; }
+
+private:
+    Container* container;
+};
+
+template <typename Container>
+inline back_insert_iterator<Container> back_inserter(Container& x)
+{
+    return back_insert_iterator<Container>(x);
+}
+
+
+template <typename Container>
+class front_insert_iterator
+{
+public:
+    typedef output_iterator_tag iterator_category;
+    typedef void value_type;
+    typedef void difference_type;
+    typedef void pointer;
+    typedef void reference;
+
+public:
+    explicit front_insert_iterator(Container& x) : container(&x) { }
+
+    front_insert_iterator& operator=(const typename Container::value_type& val)
+    {
+        container->push_front(val);
+        return *this;
+    }
+
+    front_insert_iterator& operator*() { return *this; }
+    front_insert_iterator& operator++() { return *this; }
+    front_insert_iterator& operator++(int) { return *this; }
+
+private:
+    Container* container;
+};
+
+template <typename Container>
+inline front_insert_iterator<Container> front_inserter(Container& x)
+{
+    return front_insert_iterator<Container>(x);
+}
+
+
+template <typename Container>
+class insert_iterator
+{
+public:
+    typedef output_iterator_tag iterator_category;
+    typedef void value_type;
+    typedef void difference_type;
+    typedef void pointer;
+    typedef void reference;
+
+public:
+    explicit insert_iterator(Container& x, typename Container::iterator i) : container(&x) { }
+
+    insert_iterator& operator=(const typename Container::value_type& val)
+    {
+        iter = container->insert(iter, val);
+        ++iter;
+        return *this;
+    }
+
+    insert_iterator& operator*() { return *this; }
+    insert_iterator& operator++() { return *this; }
+    insert_iterator& operator++(int) { return *this; }
+
+private:
+    Container* container;
+    typename Container::iterator iter;
+};
+
+template <typename Container>
+inline insert_iterator<Container> inserter(Container& x, typename Container::iterator i)
+{
+    return insert_iterator<Container>(x, i);
+}
+
 }
 
 #endif
