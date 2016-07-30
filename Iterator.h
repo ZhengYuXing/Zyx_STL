@@ -209,7 +209,7 @@ public:
     typedef void reference;
 
 public:
-    explicit insert_iterator(Container& x, typename Container::iterator i) : container(&x) { }
+    insert_iterator(Container& x, typename Container::iterator i) : container(&x), iter(i) { }
 
     insert_iterator& operator=(const typename Container::value_type& val)
     {
