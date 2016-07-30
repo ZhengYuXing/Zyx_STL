@@ -130,15 +130,17 @@ void __advance(RandomAccessIterator& iter, Distance n, random_access_iterator_ta
 }
 
 
+//-----------------------------【back_insert_iteator class】---------------------------------
+
 template <typename Container>
 class back_insert_iterator
 {
 public:
-    typedef output_iterator_tag iterator_category;
-    typedef void value_type;
-    typedef void difference_type;
-    typedef void pointer;
-    typedef void reference;
+    typedef output_iterator_tag    iterator_category;
+    typedef void                   value_type;
+    typedef void                   difference_type;
+    typedef void                   pointer;
+    typedef void                   reference;
 
 public:
     explicit back_insert_iterator(Container& x) : container(&x) { }
@@ -164,15 +166,17 @@ inline back_insert_iterator<Container> back_inserter(Container& x)
 }
 
 
+//----------------------------【front_insert_iteator class】---------------------------------
+
 template <typename Container>
 class front_insert_iterator
 {
 public:
-    typedef output_iterator_tag iterator_category;
-    typedef void value_type;
-    typedef void difference_type;
-    typedef void pointer;
-    typedef void reference;
+    typedef output_iterator_tag    iterator_category;
+    typedef void                   value_type;
+    typedef void                   difference_type;
+    typedef void                   pointer;
+    typedef void                   reference;
 
 public:
     explicit front_insert_iterator(Container& x) : container(&x) { }
@@ -198,15 +202,17 @@ inline front_insert_iterator<Container> front_inserter(Container& x)
 }
 
 
+//--------------------------------【insert_iteator class】-----------------------------------
+
 template <typename Container>
 class insert_iterator
 {
 public:
-    typedef output_iterator_tag iterator_category;
-    typedef void value_type;
-    typedef void difference_type;
-    typedef void pointer;
-    typedef void reference;
+    typedef output_iterator_tag    iterator_category;
+    typedef void                   value_type;
+    typedef void                   difference_type;
+    typedef void                   pointer;
+    typedef void                   reference;
 
 public:
     insert_iterator(Container& x, typename Container::iterator i) : container(&x), iter(i) { }
@@ -231,6 +237,142 @@ template <typename Container>
 inline insert_iterator<Container> inserter(Container& x, typename Container::iterator i)
 {
     return insert_iterator<Container>(x, i);
+}
+
+
+//--------------------------------【reverse_iteator class】----------------------------------
+
+template <typename Iterator>
+class reverse_iterator
+{
+public:
+    typedef typename iterator_traits<Iterator>::iterator_category    iterator_category;
+    typedef typename iterator_traits<Iterator>::value_type           value_type;
+    typedef typename iterator_traits<Iterator>::difference_type      difference_type;
+    typedef typename iterator_traits<Iterator>::pointer              pointer;
+    typedef typename iterator_traits<Iterator>::reference            reference;
+
+    typedef Iterator            iterator_type;
+    typedef reverse_iterator    self;
+
+public:
+    reverse_iterator() { }
+    explicit reverse_iterator(iterator_type x) : current(x) { }
+    reverse_iterator(const self& x) : current(x.current) { }
+
+    iterator_type base() const { return current; }
+
+    reference operator*() const
+    {
+        Iterator tmp = current;
+        return *--tmp;
+    }
+
+    pointer operator->() const { return &(operator*()); }
+
+    self& operator++()
+    {
+        --current;
+        return *this;
+    }
+
+    self operator++(int)
+    {
+        self tmp = *this;
+        --current;
+        return tmp;
+    }
+
+    self& operator--()
+    {
+        ++current;
+        return *this;
+    }
+
+    self operator--(int)
+    {
+        self tmp = *this;
+        ++current;
+        return tmp;
+    }
+
+    self operator+(difference_type n) const { return self(current - n); }
+
+    self& operator+=(difference_type n)
+    {
+        current -= n;
+        return *this;
+    }
+
+    self operator-(difference_type n) const { return self(current + n); }
+
+    self& operator-=(difference_type n)
+    {
+        current += n;
+        return *this;
+    }
+
+    reference operator[](difference_type n) const { return *(*this + n); }    
+
+private:
+    Iterator current;
+};
+
+template <typename Iterator>
+inline bool operator==(const reverse_iterator<Iterator>& lhs, 
+                       const reverse_iterator<Iterator>& rhs)
+{
+    return lhs.base() == rhs.base();
+}
+
+template <typename Iterator>
+inline bool operator!=(const reverse_iterator<Iterator>& lhs, 
+                       const reverse_iterator<Iterator>& rhs)
+{
+    return !(lhs == rhs);
+}
+
+template <typename Iterator>
+inline bool operator<(const reverse_iterator<Iterator>& lhs, 
+                       const reverse_iterator<Iterator>& rhs)
+{
+    return lhs.base() < rhs.base();
+}
+
+template <typename Iterator>
+inline bool operator>(const reverse_iterator<Iterator>& lhs, 
+                       const reverse_iterator<Iterator>& rhs)
+{
+    return rhs < lhs;
+}
+
+template <typename Iterator>
+inline bool operator<=(const reverse_iterator<Iterator>& lhs, 
+                       const reverse_iterator<Iterator>& rhs)
+{
+    return !(rhs < lhs);
+}
+
+template <typename Iterator>
+inline bool operator>=(const reverse_iterator<Iterator>& lhs, 
+                       const reverse_iterator<Iterator>& rhs)
+{
+    return !(lhs < rhs);
+}
+
+template <typename Iterator>
+inline typename reverse_iterator<Iterator>::difference_type
+operator-(const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs)
+{
+    return rhs.base() - lhs.base();
+}
+
+template <typename Iterator>
+inline reverse_iterator<Iterator>
+operator+(typename reverse_iterator<Iterator>::difference_type n, 
+          const reverse_iterator<Iterator>& x)
+{
+    return reverse_iterator<Iterator>(x.base() - n);
 }
 
 }
