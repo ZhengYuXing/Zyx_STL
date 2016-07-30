@@ -23,6 +23,9 @@ public:
     typedef size_t       size_type;
     typedef ptrdiff_t    difference_type;
 
+    typedef reverse_iterator<const_iterator>    const_reverse_iterator;
+    typedef reverse_iterator<iterator>          reverse_iterator;
+
 private:	
     typedef simple_alloc<value_type, Alloc> data_allocator;
 
@@ -100,10 +103,15 @@ public:
     }
 
 public:
-    iterator begin()  { return start;  }
+    iterator begin() { return start;  }
     const_iterator begin() const { return start; }
-    iterator end()  { 	return finish;  }
+    iterator end() { return finish;  }
     const_iterator end() const { return finish; }
+
+    reverse_iterator rbegin() { return reverse_iterator(end()); }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+    reverse_iterator rend() { return reverse_iterator(begin()); }
+    const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
     reference front() { return *start; }
     const_reference front() const { return *start; }
@@ -225,7 +233,7 @@ public:
             const size_type old_size = size();
             iterator tmp = allocate_and_copy(n, start, finish);
             destroy(start, finish);
-            deallocate(start, end_of_storage - start);
+            deallocate(start, end_of_storage - start); 
             start = tmp;
             finish = start + old_size;
             end_of_storage = start + n;
@@ -256,8 +264,9 @@ private:
     void insert_aux(iterator pos, const T& val)
     {
         if (finish != end_of_storage) {
+            construct(finish, *(finish - 1));
             ++finish;
-            copy_backward(pos, finish - 1, finish);
+            copy_backward(pos, finish - 2, finish - 1);
             *pos = val;
         } else {
             const size_type old_size = size();
