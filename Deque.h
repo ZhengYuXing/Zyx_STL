@@ -9,7 +9,7 @@
 
 namespace Zyx {
 
-size_t __deque_buf_size(size_t n, size_t sz)
+inline size_t __deque_buf_size(size_t n, size_t sz)
 {
     return n != 0 ? n : (sz < 512 ? 512 / sz : 1);
 }
@@ -54,9 +54,8 @@ struct __deque_iterator
 
     difference_type operator-(const self& x) const
     {
-        return (node - x.node - 1) * difference_type(buffer_size()) 
-                                                     + (cur - first) 
-                                                     + (x.last - x.cur);
+        return difference_type(buffer_size()) * (node - x.node - 1) 
+               + (cur - first) + (x.last - x.cur);
     }
 
     self& operator++()
@@ -223,7 +222,7 @@ public:
     void push_front(const T& val)
     {
         if (start.cur != start.first) {
-            construct(start.cur, val);
+            construct(start.cur - 1, val);
             --start.cur;
         } else {
             push_front_aux(val);
