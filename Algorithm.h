@@ -468,6 +468,25 @@ OutputIterator fill_n(OutputIterator first, Size n, const T& val)
     return first;
 }
 
+//------------------------------------【generate() function】---------------------------------
+
+template <typename ForwardIterator, typename Generator>
+void generate(ForwardIterator first, ForwardIterator last, Generator gen)
+{
+    for (; first != last; ++first)
+        *first = gen();
+}
+
+//-----------------------------------【generate_n() function】--------------------------------
+
+template <typename OutputIterator, typename Size, typename Generator>
+OutputIterator generate_n(OutputIterator first, Size n, Generator gen)
+{
+    for (; n > 0; --n, ++first)
+        *first = gen();
+    return first;
+}
+
 //-------------------------------------【remove() function】----------------------------------
 
 template <typename ForwardIterator, typename T>
