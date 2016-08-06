@@ -38,21 +38,21 @@ public:
     void reset()
     {
         if (count != nullptr) {
-        	if (--*count == 0) {
+            if (--*count == 0) {
                 delete ptr;
                 delete count;
-        	}
-        	ptr = nullptr;
-        	count = nullptr;
+            }
+            ptr = nullptr;
+            count = nullptr;
         }
     }
 
     void reset(T* p)
     {
         if (ptr != p) {
-        	reset();
-        	ptr = p;
-        	count = new size_t(1);
+            reset();
+            ptr = p;
+            count = new size_t(1);
         }
     }
 
