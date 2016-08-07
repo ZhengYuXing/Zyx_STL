@@ -631,6 +631,138 @@ OutputIterator replace_copy_if(InputIterator first, InputIterator last, OutputIt
     return result;
 }
 
+//----------------------------------【reverse() function】------------------------------------
+
+template <typename BidirectionalIterator>
+void reverse(BidirectionalIterator first, BidirectionalIterator last)
+{
+    __reverse(first, last, iterator_category(first));
+}
+
+template <typename BidirectionalIterator>
+void __reverse(BidirectionalIterator first, BidirectionalIterator last, 
+               bidirectional_iterator_tag)
+{
+    while (first != last && first != --last) {
+        iter_swap(first, last);
+        ++first;
+    }
+}
+
+template <typename RandomAccessIterator>
+void __reverse(RandomAccessIterator first, RandomAccessIterator last, 
+               random_access_iterator_tag)
+{
+    while (first < last) 
+        iter_swap(first++, --last);
+}
+
+//--------------------------------【reverse_copy() function】---------------------------------
+
+template <typename BidirectionalIterator, typename OutputIterator>
+OutputIterator reverse_copy(BidirectionalIterator first, BidirectionalIterator last, 
+                            OutputIterator result)
+{
+    while (first != last) {
+        --last;
+        *result = *last;
+        ++result;
+    }
+    return result;
+}
+
+
+template <typename ForwardIterator>
+void rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator last)
+{
+    if (first == middle || middle == last)
+        return;
+    __rotate(first, middle, last, difference_type(first), iterator_category(first));
+
+    // ForwardIterator next = middle;
+    // while (first != next) {
+    //     iter_swap(first++, next++);
+    //     if (next == last)
+    //         next = middle;
+    //     else if (first == middle)
+    //         middle = next;
+    // }
+}
+
+template <typename ForwardIterator, typename Distance>
+void __rotate(ForwardIterator first, ForwardIterator middle, 
+              ForwardIterator last, Distance*, forward_iterator_tag)
+{
+    ForwardIterator i = middle;
+    while (true) {
+        iter_swap(first, i);
+        ++first;
+        ++i;
+        if (first == middle) {
+            if (i == last) return;
+            middle = i;
+        } else if (i == last) {
+            i = middle;
+        }
+    }
+}
+
+template <typename BidirectionalIterator, typename Distance>
+void __rotate(BidirectionalIterator first, BidirectionalIterator middle, 
+              BidirectionalIterator last, Distance*, bidirectional_iterator_tag)
+{
+    reverse(first, middle);
+    reverse(middle, last);
+    reverse(first, last);
+}
+
+template <typename RandomAccessIterator, typename Distance>
+void __rotate(RandomAccessIterator first, RandomAccessIterator middle, 
+              RandomAccessIterator last, Distance*, random_access_iterator_tag)
+{
+    Distance n = __gcd(last - first, middle - first);
+    while (n--)
+        __rotate_cycle(first, last, first + n, middle - first, value_type(first));
+}
+
+template <typename EuclideanRingElement>
+EuclideanRingElement __gcd(EuclideanRingElement m, EuclideanRingElement n)
+{
+    while (n != 0) {
+        EuclideanRingElement t = m % n;
+        m = n;
+        n = t;
+    }
+    return m;
+}
+
+template <typename RandomAccessIterator, typename Distance, typename T>
+void __rotate_cycle(RandomAccessIterator first, RandomAccessIterator last, 
+                    RandomAccessIterator initial, Distance shift, T*)
+{
+    T value = *initial;
+    RandomAccessIterator ptr1 = initial;
+    RandomAccessIterator ptr2 = initial + shift;
+    while (ptr2 != initial) {
+        *ptr1 = *ptr2;
+        ptr1 = ptr2;
+        if (last - ptr2 > shift)
+            ptr2 += shift;
+        else
+            ptr2 = first + (shift - (last - ptr2));
+    }
+    *ptr1 = value;
+}
+
+//--------------------------------【rotate_copy() function】----------------------------------
+
+template <typename ForwardIterator, typename OutputIterator>
+OutputIterator rotate_copy(ForwardIterator first, ForwardIterator middle, 
+                           ForwardIterator last, OutputIterator result)
+{
+    return copy(first, middle, copy(middle, last, result));
+}
+
 //---------------------------------【transform() function】-----------------------------------
 
 template <typename InputIterator, typename OutputIterator, typename UnaryPredicate>
@@ -736,46 +868,6 @@ OutputIterator unique_copy(InputIterator first, InputIterator last,
         }
     }
     return ++result;
-}
-
-//----------------------------------【reverse() function】------------------------------------
-
-template <typename BidirectionalIterator>
-void reverse(BidirectionalIterator first, BidirectionalIterator last)
-{
-    __reverse(first, last, iterator_category(first));
-}
-
-template <typename BidirectionalIterator>
-void __reverse(BidirectionalIterator first, BidirectionalIterator last, 
-               bidirectional_iterator_tag)
-{
-    while (first != last && first != --last) {
-        iter_swap(first, last);
-        ++first;
-    }
-}
-
-template <typename RandomAccessIterator>
-void __reverse(RandomAccessIterator first, RandomAccessIterator last, 
-               random_access_iterator_tag)
-{
-    while (first < last) 
-        iter_swap(first++, --last);
-}
-
-//--------------------------------【reverse_copy() function】---------------------------------
-
-template <typename BidirectionalIterator, typename OutputIterator>
-OutputIterator reverse_copy(BidirectionalIterator first, BidirectionalIterator last, 
-                            OutputIterator result)
-{
-    while (first != last) {
-        --last;
-        *result = *last;
-        ++result;
-    }
-    return result;
 }
 
 //---------------------------------【set_union() function】-----------------------------------
