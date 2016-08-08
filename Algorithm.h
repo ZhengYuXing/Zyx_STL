@@ -671,6 +671,7 @@ OutputIterator reverse_copy(BidirectionalIterator first, BidirectionalIterator l
     return result;
 }
 
+//-----------------------------------【rotate() function】------------------------------------
 
 template <typename ForwardIterator>
 void rotate(ForwardIterator first, ForwardIterator middle, ForwardIterator last)
