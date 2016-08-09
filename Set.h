@@ -2,6 +2,7 @@
 #define ZYX_SET 
 
 #include "RedBlackTree.h"
+#include "Functional.h"
 
 namespace Zyx {
 
@@ -21,10 +22,10 @@ private:
 	typedef RedBlackTree<Key, Key, identity<Key>, Compare, Alloc> rep_type;
 
 public:
-    typedef Key                                   key_type;
-    typedef Key                                   value_type;
-    typedef Compare                               key_compare;
-    typedef Compare                               value_compare;
+    typedef Key        key_type;
+    typedef Key        value_type;
+    typedef Compare    key_compare;
+    typedef Compare    value_compare;
 
     typedef typename rep_type::const_pointer      pointer;
     typedef typename rep_type::const_pointer      const_pointer;
@@ -83,12 +84,26 @@ public:
         t.insert_unique(first, last);
     }
 
+    void erase(iterator pos)
+    {
+        typedef typename rep_type::iterator rep_iterator;
+        t.erase((rep_iterator&)pos);
+    }
+
+    void erase(iterator first, iterator last)
+    {
+        typedef typename rep_type::iterator rep_iterator;
+        t.erase((rep_iterator&)first, (rep_iterator&)last);
+    }
+
+    size_type erase(const key_type& k) { return t.erase(k); }
+
     void clear() { t.clear(); }
     void swap(Set& x) { t.swap(x.t); }
 
+public:
     iterator find(const value_type& val) const { return t.find(val); }
     size_type count(const value_type& val) const { return t.count(val); }
-
     iterator lower_bound(const value_type& val) const { return t.lower_bound(val); }
     iterator upper_bound(const value_type& val) const { return t.upper_bound(val); }
 
@@ -148,6 +163,8 @@ inline void swap(Set<Key, Compare, Alloc>& x, Set<Key, Compare, Alloc>& y)
 {
     x.swap(y);
 }
+
+
 
 }
 

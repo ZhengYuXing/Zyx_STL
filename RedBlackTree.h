@@ -276,6 +276,32 @@ public:
             insert_unique(*first);
     }
 
+    void erase(iterator pos)
+    {
+        link_type y = (link_type)__rb_tree_rebalance_for_erase(pos.node, 
+                                                               header->parent, 
+                                                               header->left, 
+                                                               header->right);
+        destroy_node(y);
+        --node_count;
+    }
+    
+    void erase(iterator first, iterator last)
+    {
+        if (first == begin() && last == end())
+            clear();
+        else 
+            while (first != last) erase(first++);
+    }
+
+    size_type erase(const key_type& k)
+    {
+        Pair<iterator, iterator> p = equal_range(k);
+        size_type n = distance(p.first, p.second);
+        erase(p.first, p.second);
+        return n;
+    }
+
     void clear() 
     {
         if (node_count != 0) {
@@ -628,9 +654,74 @@ private:
             }
         }
 
-        if (y->color == __rb_tree_black) {
-            
+        if (y->color != __rb_tree_red) {
+            while (x != root && (x == nullptr || x->color == __rb_tree_black)) {
+                if (x == x_parent->left) {
+                    base_ptr w = x_parent->right;
+
+                    if (w->color == __rb_tree_red) {
+                        w->color = __rb_tree_black;
+                        x_parent->color = __rb_tree_red;
+                        __rb_tree_rotate_left(x_parent, root);
+                        w = x_parent->right;
+                    }
+
+                    if ((w->left == nullptr || w->left->color == __rb_tree_black) &&
+                        (w->right == nullptr || w->right->color == __rb_tree_black)) {
+                        w->color = __rb_tree_red;
+                        x = x_parent;
+                        x_parent = x_parent->parent;
+                    } else {
+                        if (w->right == nullptr || w->right->color == __rb_tree_black) {
+                            if (w->left != nullptr) 
+                                w->left->color = __rb_tree_black;
+                            w->color = __rb_tree_red;
+                            __rb_tree_rotate_right(w, root);
+                            w = x_parent->right;
+                        }
+                        w->color = x_parent->color;
+                        x_parent->color = __rb_tree_black;
+                        if (w->right != nullptr)
+                            w->right->color = __rb_tree_black;
+                        __rb_tree_rotate_left(x_parent, root);
+                        break;
+                    }
+                } else {
+                    base_ptr w = x_parent->left;
+
+                    if (w->color == __rb_tree_red) {
+                        w->color = __rb_tree_black;
+                        x_parent->color = __rb_tree_red;
+                        __rb_tree_rotate_right(x_parent, root);
+                        w = x_parent->left;
+                    }
+
+                    if ((w->right == nullptr || w->right->color == __rb_tree_black) &&
+                        (w->left == nullptr || w->left->color == __rb_tree_black)) {
+                        w->color = __rb_tree_red;
+                        x = x_parent;
+                        x_parent = x_parent->parent;
+                    } else {
+                        if (w->left == nullptr || w->left->color == __rb_tree_black) {
+                            if (w->right != nullptr) 
+                                w->right->color = __rb_tree_black;
+                            w->color = __rb_tree_red;
+                            __rb_tree_rotate_left(w, root);
+                            w = x_parent->left;
+                        }
+                        w->color = x_parent->color;
+                        x_parent->color = __rb_tree_black;
+                        if (w->left != nullptr)
+                            w->left->color = __rb_tree_black;
+                        __rb_tree_rotate_right(x_parent, root);
+                        break;
+                    }
+                }
+            }
+            if (x != nullptr)
+                x->color = __rb_tree_black;
         }
+        return y;
     }
 
 private:

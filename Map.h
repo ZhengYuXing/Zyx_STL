@@ -40,8 +40,8 @@ public:
     };
 
 private:
-    typedef RedBlackTree<key_type, value_type, 
-                         select1st<value_type>, key_compare, Alloc> rep_type;
+    typedef RedBlackTree<key_type, value_type, select1st<value_type>, key_compare, Alloc> 
+            rep_type;
 
 public:
     typedef typename rep_type::pointer            pointer;
@@ -102,20 +102,23 @@ public:
 
     mapped_type& operator[](const key_type& k)
     {
-        return (*((insert(value_type(k, Value()))).first)).second;
-    }	
+        return insert(value_type(k, Value())).first->second;
+        // return (*((insert(value_type(k, Value()))).first)).second;
+    }
+
+    void erase(iterator pos) { t.erase(pos); }
+    void erase(iterator first, iterator last) { t.erase(first, last); }
+    size_type erase(const key_type& k) { return t.erase(k); }
 
     void clear() { t.clear(); }
     void swap(Map& x) { t.swap(x.t); }
 
+public:
     iterator find(const key_type& k) { return t.find(k); }
     const_iterator find(const key_type& k) const { return t.find(k); }
-    
     size_type count(const key_type& k) const { return t.count(k); }
-
     iterator lower_bound(const key_type& k) { return t.lower_bound(k); }
     const_iterator lower_bound(const key_type& k) const { return t.lower_bound(k); }
-
     iterator upper_bound(const key_type& k) { return t.upper_bound(k); }
     const_iterator upper_bound(const key_type& k) const { return t.lower_bound(k); }
 
