@@ -164,8 +164,6 @@ inline void swap(Set<Key, Compare, Alloc>& x, Set<Key, Compare, Alloc>& y)
     x.swap(y);
 }
 
-
-
 }
 
 #endif
