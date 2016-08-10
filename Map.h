@@ -152,14 +152,14 @@ inline bool operator!=(const Map<Key, Value, Compare, Alloc>& lhs,
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline bool operator<(const Map<Key, Value, Compare, Alloc>& lhs, 
-                       const Map<Key, Value, Compare, Alloc>& rhs)
+                      const Map<Key, Value, Compare, Alloc>& rhs)
 {
     return lhs.t < rhs.t;
 }
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline bool operator>(const Map<Key, Value, Compare, Alloc>& lhs, 
-                       const Map<Key, Value, Compare, Alloc>& rhs)
+                      const Map<Key, Value, Compare, Alloc>& rhs)
 {
     return rhs < lhs;
 }
@@ -180,7 +180,7 @@ inline bool operator>=(const Map<Key, Value, Compare, Alloc>& lhs,
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline void swap(Map<Key, Value, Compare, Alloc>& lhs, 
-	             Map<Key, Value, Compare, Alloc>& rhs)
+                 Map<Key, Value, Compare, Alloc>& rhs)
 {
     lhs.swap(rhs);
 }

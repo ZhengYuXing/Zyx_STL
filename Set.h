@@ -19,7 +19,7 @@ public:
     // friend bool operator<(const Set<K, C, A>& lhs, const Set<K, C, A>& rhs);
 
 private:
-	typedef RedBlackTree<Key, Key, identity<Key>, Compare, Alloc> rep_type;
+    typedef RedBlackTree<Key, Key, identity<Key>, Compare, Alloc> rep_type;
 
 public:
     typedef Key        key_type;
@@ -113,7 +113,7 @@ public:
     }
 
 private:
-	rep_type t;
+    rep_type t;
 };
 
 template <typename Key, typename Compare, typename Alloc>

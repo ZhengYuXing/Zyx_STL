@@ -174,7 +174,7 @@ inline bool operator>=(const MultiMap<Key, Value, Compare, Alloc>& lhs,
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 inline void swap(MultiMap<Key, Value, Compare, Alloc>& lhs, 
-	             MultiMap<Key, Value, Compare, Alloc>& rhs)
+                 MultiMap<Key, Value, Compare, Alloc>& rhs)
 {
     lhs.swap(rhs);
 }
