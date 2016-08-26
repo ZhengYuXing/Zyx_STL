@@ -256,6 +256,91 @@ struct _type_traits<const signed char*>
     typedef _true_type    is_POD_type;	
 };
 
+
+template <typename T>
+struct _is_integer
+{
+    typedef _false_type integral;
+};
+
+template <>
+struct _is_integer<bool>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<char>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<signed char>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<unsigned char>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<wchar_t>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<short>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<unsigned short>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<int>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<unsigned int>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<long>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<unsigned long>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<long long>
+{
+    typedef _true_type integral;
+};
+
+template <>
+struct _is_integer<unsigned long long>
+{
+    typedef _true_type integral;
+};
+
 }
 
 #endif
