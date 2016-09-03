@@ -82,7 +82,7 @@ inline bool operator!=(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
 template <typename T1, typename T2>
 inline bool operator<(const Pair<T1, T2>& lhs, const Pair<T1, T2>& rhs)
 {
-    return lhs.first < rhs.first || (!(lhs.first < rhs.first) && lhs.second < rhs.second);
+    return lhs.first < rhs.first || (!(rhs.first < lhs.first) && lhs.second < rhs.second);
 }
 
 template <typename T1, typename T2>
