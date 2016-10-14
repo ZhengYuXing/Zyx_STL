@@ -69,11 +69,14 @@ public:
 
     Vector& operator=(const Vector& x)
     {
-        if (this != &x) {
-            Vector tmp(x);
-            swap(tmp);
-        }
+        Vector(x).swap(*this);
         return *this;
+
+        // if (this != &x) {
+        //     Vector tmp(x);
+        //     swap(tmp);
+        // }
+        // return *this;
 
         // another way:
         // if (this != &x) {
