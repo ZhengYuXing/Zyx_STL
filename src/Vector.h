@@ -30,7 +30,9 @@ private:
     typedef simple_alloc<value_type, Alloc> data_allocator;
 
 public:
-    Vector() : start(nullptr), finish(nullptr), end_of_storage(nullptr) { }
+    Vector() : start(nullptr), finish(nullptr), end_of_storage(nullptr) 
+    { 
+    }
 
     Vector(size_type n, const T& val) 
       : start(nullptr), finish(nullptr), end_of_storage(nullptr)
@@ -228,7 +230,10 @@ public:
             insert(finish, n - size(), val);
     }
 
-    void resize(size_type n) { resize(n, T()); }
+    void resize(size_type n) 
+    { 
+        resize(n, T()); 
+    }
 
     void reserve(size_type n)
     {
@@ -243,7 +248,10 @@ public:
         }
     }
 
-    void clear() { erase(start, finish); }
+    void clear() 
+    { 
+        erase(start, finish); 
+    }
 
     void swap(Vector& x)
     {
