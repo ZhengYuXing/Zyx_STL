@@ -2,7 +2,7 @@
 #define ZYX_PRIORIY_QUEUE 
 
 #include "Vector.h"
-#include "Algorithm.h"
+#include "Heap.h"
 #include "Functional.h"
 
 namespace Zyx {
@@ -19,21 +19,43 @@ public:
     typedef Container                              container_type;
 
 public:
-    PriorityQueue() : c() { }
-    explicit PriorityQueue(const Compare& x) : c(), comp(x) { }
+    PriorityQueue() : c() 
+    { 
+    }
+
+    explicit PriorityQueue(const Compare& x) : c(), comp(x) 
+    { 
+    }
 
     template <typename InputIterator>
     PriorityQueue(InputIterator first, InputIterator last) 
-      : c(first, last) { make_heap(c.begin(), c.end(), comp); }
+      : c(first, last) 
+    {
+        make_heap(c.begin(), c.end(), comp); 
+    }
 
     template <typename InputIterator>
     PriorityQueue(InputIterator first, InputIterator last, const Compare& x) 
-      : c(first, last) { make_heap(c.begin(), c.end(), comp); }
+      : c(first, last) 
+    {
+        make_heap(c.begin(), c.end(), comp); 
+    }
 
 public:
-    bool empty() const { return c.empty(); }
-    size_type size() const { return c.size(); }
-    const_reference top() const { return c.front(); }
+    bool empty() const 
+    { 
+        return c.empty(); 
+    }
+
+    size_type size() const 
+    { 
+        return c.size(); 
+    }
+
+    const_reference top() const 
+    { 
+        return c.front(); 
+    }
 
     void push(const T& val) 
     {
