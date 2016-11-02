@@ -191,6 +191,41 @@ count_if(InputIterator first, InputIterator last, Predicate pred)
     return n;
 }
 
+//--------------------------------【adjacent_find() function】-------------------------------
+
+template <typename ForwardIterator>
+ForwardIterator adjacent_find(ForwardIterator first, ForwardIterator last)
+{
+    if (first == last) {
+        return last;
+    }
+    ForwardIterator next = first;
+    ++next;
+    for (; next != last; ++next, ++first) {
+        if (*first == *next) {
+            return first;
+        }
+    }
+    return last;
+}
+
+template <typename ForwardIterator, typename BinaryPredicate>
+ForwardIterator adjacent_find(ForwardIterator first, ForwardIterator last, 
+                              BinaryPredicate pred)
+{
+    if (first == last) {
+        return last;
+    }
+    ForwardIterator next = first;
+    ++next;
+    for (; next != last; ++next, ++first) {
+        if (pred(*first, *next)) {
+            return first;
+        }
+    }
+    return last;
+}
+
 //-------------------------------------【find() function】------------------------------------
 
 template <typename InputIterator, typename T>
@@ -1340,6 +1375,7 @@ BidirectionalIterator partition(BidirectionalIterator first, BidirectionalIterat
 }
 
 //---------------------------------【nth_element() function】---------------------------------
+//                   Complexity : Linear in distance(first, last) on average
 
 template <typename RandomAccessIterator>
 void nth_element(RandomAccessIterator first, RandomAccessIterator nth, 
