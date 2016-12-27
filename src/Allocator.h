@@ -7,14 +7,16 @@
 #include <climits>
 #include <iostream>
 
-namespace Zyx {	
+namespace Zyx 
+{
 
 template <typename T>
 T* _allocate(size_t n, T*)
 {
     std::set_new_handler(0);
     T* tmp = (T*)(operator new(n * sizeof(T)));
-    if (tmp == nullptr) {
+    if (tmp == nullptr)
+    {
         std::cerr << "out of memory" << std::endl;
         exit(1);
     }
@@ -53,7 +55,7 @@ public:
 
 public:
     template <typename U>
-    struct rebind 
+    struct rebind
     {
         typedef Allocator<U> other;
     };
