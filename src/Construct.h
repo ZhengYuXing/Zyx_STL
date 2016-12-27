@@ -42,7 +42,7 @@ inline void __destroy_aux(ForwardIterator first, ForwardIterator last, _false_ty
 {
     for (; first != last; ++first)
     {
-	    destroy(&*first);
+         destroy(&*first);
     }
 }
 
