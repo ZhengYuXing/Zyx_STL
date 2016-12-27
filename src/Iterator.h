@@ -1,7 +1,8 @@
 #ifndef ZYX_ITERATOR
 #define ZYX_ITERATOR
 
-namespace Zyx {
+namespace Zyx 
+{
 	
 struct input_iterator_tag { };
 struct output_iterator_tag { };
@@ -111,16 +112,29 @@ void advance(InputIterator& iter, Distance n)
 template <typename InputIterator, typename Distance>
 void __advance(InputIterator& iter, Distance n, input_iterator_tag)
 {
-    while (n--) ++iter;
+    while (n--)
+    {
+        ++iter;
+    }
 }
 
 template <typename BidirectionalIterator, typename Distance>
 void __advance(BidirectionalIterator& iter, Distance n, bidirectional_iterator_tag)
 {
     if (n >= 0)
-        while (n--) ++iter;
+    {
+        while (n--) 
+        {
+            ++iter;
+        }
+    }
     else
-        while (n++) --iter;
+    {
+        while (n++) 
+        {
+            --iter;
+        }
+    }
 }
 
 template <typename RandomAccessIterator, typename Distance>

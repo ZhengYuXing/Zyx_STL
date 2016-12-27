@@ -1,7 +1,8 @@
 #ifndef ZYX_TYPE_TRAITS
 #define ZYX_TYPE_TRAITS 
 
-namespace Zyx {
+namespace Zyx 
+{
 
 struct _true_type { };
 struct _false_type { };
