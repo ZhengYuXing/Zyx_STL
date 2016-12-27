@@ -5,7 +5,8 @@
 #include "TypeTraits.h"
 #include "Algorithm.h"
 
-namespace Zyx {
+namespace Zyx
+{
 
 //------------------------------------【construct() function】---------------------------------
 
@@ -40,23 +41,22 @@ template <typename ForwardIterator>
 inline void __destroy_aux(ForwardIterator first, ForwardIterator last, _false_type)
 {
     for (; first != last; ++first)
+    {
 	    destroy(&*first);
+    }
 }
 
 template <typename ForwardIterator>
 inline void __destroy_aux(ForwardIterator first, ForwardIterator last, _true_type)
 {
-
 }
 
 inline void destroy(char*, char*)
 {
-
 }
 
 inline void destroy(wchar_t*, wchar_t*)
 {
-
 }
 
 //---------------------------【uninitialized_copy() function】-------------------------------
@@ -88,7 +88,9 @@ inline ForwardIterator __uninitialized_copy_aux(InputIterator first, InputIterat
                                                 ForwardIterator result, _false_type)
 {
     for (; first != last; ++first, ++result)
+    {
         construct(&*result, *first);
+    }
     return result;
 }
 
@@ -131,7 +133,8 @@ template <typename ForwardIterator, typename T>
 inline void 
 __uninitialized_fill_aux(ForwardIterator first, ForwardIterator last, const T& val, _false_type)
 {
-    while (first != last) {
+    while (first != last) 
+    {
         construct(&*first, val);
         ++first;
     }
@@ -164,7 +167,8 @@ template <typename ForwardIterator, typename Size, typename T>
 inline ForwardIterator 
 __uninitialized_fill_n_aux(ForwardIterator first, Size n, const T& val, _false_type)
 {
-    while (n > 0) {
+    while (n > 0) 
+    {
         construct(&*first, val);
         --n;
         ++first;
