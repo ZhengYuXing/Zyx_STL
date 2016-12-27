@@ -3,7 +3,8 @@
 
 #include "Iterator.h"
 
-namespace Zyx {
+namespace Zyx 
+{
 
 //-------------------------------【perlocate_down() function】--------------------------------
 
@@ -25,14 +26,21 @@ template <typename RandomAccessIterator, typename Distance, typename T>
 void __perlocate_down(RandomAccessIterator first, Distance holeIndex, Distance len, T value)
 {
     Distance child = 2 * holeIndex + 1;
-    while (child < len) {
+    while (child < len) 
+    {
         if (child + 1 < len && *(first + child) < *(first + child + 1))
+        {
             ++child;
+        }
 
         if (*(first + child) > value)
+        {
             *(first + holeIndex) = *(first + child);
+        }
         else
+        {
             break;
+        }
 
         holeIndex = child;
         child = 2 * holeIndex + 1;
@@ -60,7 +68,8 @@ template <typename RandomAccessIterator, typename Distance, typename T>
 void __push_heap(RandomAccessIterator first, Distance holeIndex, Distance topIndex, T value)
 {
     Distance parent = (holeIndex - 1) / 2;
-    while (holeIndex > topIndex && *(first + parent) < value) {
+    while (holeIndex > topIndex && *(first + parent) < value) 
+    {
         *(first + holeIndex) = *(first + parent);
         holeIndex = parent;
         parent = (holeIndex - 1) / 2;
@@ -79,7 +88,8 @@ void __push_heap(RandomAccessIterator first, Compare comp,
                  Distance holeIndex, Distance topIndex, T value)
 {
     Distance parent = (holeIndex - 1) / 2;
-    while (holeIndex > topIndex && comp(*(first + parent), value)) {
+    while (holeIndex > topIndex && comp(*(first + parent), value)) 
+    {
         *(first + holeIndex) = *(first + parent);
         holeIndex = parent;
         parent = (holeIndex - 1) / 2;
@@ -116,17 +126,25 @@ void __adjust_heap(RandomAccessIterator first, Distance holeIndex, Distance len,
 {
     Distance topIndex = holeIndex;
     Distance secondChild = 2 * holeIndex + 2;
-    while (secondChild < len) {
+
+    while (secondChild < len) 
+    {
         if (*(first + secondChild) < *(first + secondChild - 1))
+        {
             --secondChild;
+        }
+
         *(first + holeIndex) = *(first + secondChild);
         holeIndex = secondChild;
         secondChild = 2 * holeIndex + 2;
     }
-    if (secondChild == len) {
+
+    if (secondChild == len) 
+    {
         *(first + holeIndex) = *(first + secondChild - 1);
         holeIndex = secondChild - 1;
     }
+
     __push_heap(first, holeIndex, topIndex, value);
 }
 
@@ -145,20 +163,27 @@ void pop_heap(RandomAccessIterator first, RandomAccessIterator last, Compare com
     // difference_type secondChild = 2 * holeIndex + 2;
     // difference_type len = last - first - 1;
 
-    // while (secondChild < len) {
+    // while (secondChild < len) 
+    // {
     //     if (comp(*(first + secondChild), *(first + secondChild - 1)))
+    //     {
     //         --secondChild;
+    //     }
+
     //     *(first + holeIndex) = *(first + secondChild);
     //     holeIndex = secondChild;
     //     secondChild = 2 * holeIndex + 2;
     // }
-    // if (secondChild == len) {
+
+    // if (secondChild == len) 
+    // {
     //     *(first + holeIndex) = *(first + secondChild - 1);
     //     holeIndex = secondChild - 1;
     // }
 
     // difference_type parent = (holeIndex - 1) / 2;
-    // while (holeIndex > topIndex && comp(*(first + parent), value)) {
+    // while (holeIndex > topIndex && comp(*(first + parent), value)) 
+    // {
     //     *(first + holeIndex) = *(first + parent);
     //     holeIndex = parent;
     //     parent = (holeIndex - 1) / 2;
@@ -171,15 +196,21 @@ void __adjust_heap(RandomAccessIterator first, Compare comp,
                    Distance holeIndex, Distance len, T value)
 {
     Distance child = 2 * holeIndex + 1;
-    while (child < len) {
+    while (child < len) 
+    {
         if (child + 1 < len && comp(*(first + child), *(first + child + 1)))
+        {
             ++child;
+        }
 
-        if (comp(value, *(first + child))) {
+        if (comp(value, *(first + child))) 
+        {
             *(first + holeIndex) = *(first + child);
             holeIndex = child;
             child = 2 * holeIndex + 1;
-        } else {
+        } 
+        else 
+        {
             break;
         }
     }
@@ -199,10 +230,14 @@ template <typename RandomAccessIterator, typename T, typename Distance>
 void __make_heap(RandomAccessIterator first, RandomAccessIterator last, T*, Distance*)
 {
     if (last - first < 2)
+    {
         return;
+    }
+
     Distance len = last - first;
     Distance parent = (len - 2) / 2;
-    while (parent >= 0) {
+    while (parent >= 0) 
+    {
         __adjust_heap(first, parent, len, T(*(first + parent)));
         --parent;
     }
@@ -212,11 +247,15 @@ template <typename RandomAccessIterator, typename Compare>
 void make_heap(RandomAccessIterator first, RandomAccessIterator last, Compare comp)
 {
     if (last - first < 2)
+    {
         return;
+    }
+
     typedef typename iterator_traits<RandomAccessIterator>::difference_type difference_type;
     difference_type len = last - first;
     difference_type parent = (len - 2) / 2;
-    while (parent >= 0) {
+    while (parent >= 0) 
+    {
         __adjust_heap(first, comp, parent, len, *(first + parent));
         --parent;
     }
@@ -229,14 +268,18 @@ template <typename RandomAccessIterator>
 void sort_heap(RandomAccessIterator first, RandomAccessIterator last)
 {
     while (last - first > 1)
+    {
         pop_heap(first, last--);
+    }
 }
 
 template <typename RandomAccessIterator, typename Compare>
 void sort_heap(RandomAccessIterator first, RandomAccessIterator last, Compare comp)
 {
     while (last - first > 1)
+    {
         pop_heap(first, last--, comp);
+    }
 }
 
 }
