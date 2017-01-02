@@ -5,7 +5,8 @@
 #include "Alloc.h"
 #include "Construct.h"
 
-namespace Zyx {
+namespace Zyx 
+{
 
 struct __slist_node_base
 {
@@ -29,7 +30,9 @@ size_t __slist_size(__slist_node_base* node)
 {
     size_t result = 0;
     for (; node != nullptr; node = node->next)
+    {
         ++result;
+    }
     return result;
 }
 
@@ -148,8 +151,10 @@ public:
 
     void clear()
     {
-        while (!empty()) 
+        while (!empty())
+        {
             pop_front();
+        }
     }
 
 private:

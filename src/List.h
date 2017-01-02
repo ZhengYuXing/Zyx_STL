@@ -7,7 +7,8 @@
 #include "Algorithm.h"
 #include "Utility.h"
 
-namespace Zyx {
+namespace Zyx 
+{
 
 template <typename T>
 struct __list_node
@@ -105,7 +106,8 @@ public:
     List(InputIterator first, InputIterator last)
     {
         empty_intialize();
-        while (first != last) {
+        while (first != last)
+        {
             push_back(*first);
             ++first;
         }
@@ -115,21 +117,27 @@ public:
     {
         empty_intialize();
         for (const_iterator iter = x.begin(); iter != x.end(); ++iter)
+        {
             push_back(*iter);
+        }
     }
 
     List& operator=(const List& x)
     {
-        if (this != &x) {
+        if (this != &x) 
+        {
             List tmp(x);
             swap(tmp);
         }
         return *this;
         
-        // if (this != &x) {
+        // if (this != &x) 
+        // {
         // 	clear();
         // 	for (const_iterator iter = x.begin(); iter != x.end(); ++iter)
+        //     {
         // 	    push_back(*iter);
+        //     }
         // }
         // return *this;		
     }
@@ -199,14 +207,17 @@ public:
     iterator erase(iterator first, iterator last)
     {
         while (first != last)
+        {
             first = erase(first);
+        }
         return last;
     }
 
     void clear()
     {
         link_type cur = node->next;
-        while (cur != node) {
+        while (cur != node)
+        {
             link_type tmp = cur;
             cur = cur->next;
             destroy_node(tmp);
@@ -222,11 +233,14 @@ public:
     {
         iterator first = begin();
         iterator last = end();
-        while (first != last) {
+        while (first != last)
+        {
             iterator tmp = first;
             ++tmp;
             if (*first == val)
+            {
                 erase(first);
+            }
             first = tmp;
         }
     }
@@ -236,11 +250,14 @@ public:
     {
         iterator first = begin();
         iterator last = end();
-        while (first != last) {
+        while (first != last)
+        {
             iterator tmp = first;
             ++tmp;
             if (pred(*first))
+            {
                 erase(first);
+            }
             first = tmp;
         }
     }
@@ -250,13 +267,21 @@ public:
         iterator first = begin();
         iterator last = end();
         if (first == last)
+        {
             return;
+        }
+
         iterator cur = first;
-        while (++cur != last) {
-            if (*cur == *first) 
+        while (++cur != last)
+        {
+            if (*cur == *first)
+            {
                 erase(cur);
-            else 
+            }
+            else
+            {
                 first = cur;                 
+            }
             cur = first;
         }
     }
@@ -264,7 +289,9 @@ public:
     void splice(iterator pos, List& x)
     {
         if (!x.empty())
+        {
             transfer(pos, x.begin(), x.end());
+        }
     }
 
     void splice(iterator pos, List& x, iterator i)
@@ -272,14 +299,18 @@ public:
         iterator j = i;
         ++j;
         if (pos == i || pos == j)
+        {
             return;
+        }
         transfer(pos, i, j);
     }
 
     void splice(iterator pos, List& x, iterator first, iterator last)
     {
         if (first != last)
+        {
             transfer(pos, first, last);
+        }
     }
 
     void merge(List& x)
@@ -289,28 +320,37 @@ public:
         iterator first2 = x.begin();
         iterator last2 = x.end();
 
-        while (first1 != last1 && first2 != last2) {
-            if (*first2 < *first1) {
+        while (first1 != last1 && first2 != last2)
+        {
+            if (*first2 < *first1)
+            {
                 iterator next = first2;
                 transfer(first1, first2, ++next);
                 first2 = next;
-            } else {
+            }
+            else
+            {
                 ++first1;
             }
         }
 
         if (first2 != last2)
+        {
             transfer(last1, first2, last2);
+        }
     }
 
     void reverse()
     {
         if (node->next == node || node->next->next == node)
+        {
             return;
+        }
 
         iterator first = begin();
         ++first;
-        while (first != end()) {
+        while (first != end()) 
+        {
             iterator old = first;
             ++first;
             transfer(begin(), old, first);
@@ -320,7 +360,8 @@ public:
         // another way:		
         link_type prev_node = node->next;
         link_type curr_node = node->next->next;
-        while (curr_node != node) {
+        while (curr_node != node) 
+        {
             prev_node->next = curr_node->next;
             curr_node->next = node->next;
             node->next = curr_node;
@@ -335,25 +376,33 @@ public:
     void sort()
     {
         if (node->next == node || node->next->next == node)
+        {
             return;
+        }
 
         List carry;
         List counter[64];
         int fill = 0;
-        while (!empty()) {
+        while (!empty())
+        {
             carry.splice(carry.begin(), *this, begin());
             int i = 0;
-            while (i < fill && !counter[i].empty()) {
+            while (i < fill && !counter[i].empty())
+            {
                 counter[i].merge(carry);
                 carry.swap(counter[i++]);
             }
             carry.swap(counter[i]);
             if (i == fill)
+            {
                 ++fill;
+            }
         }
 
         for (int i = 1; i < fill; i++) 
+        {
             counter[i].merge(counter[i-1]);
+        }
         swap(counter[fill-1]);
 	}
 
@@ -389,7 +438,9 @@ private:
     void fill_initialize(size_type n, const value_type& val)
     {
         while (n--)
+        {
             push_back(val);
+        }
     }
 
     void transfer(iterator pos, iterator first, iterator last)
@@ -407,6 +458,9 @@ private:
     link_type node;
 };
 
+
+//----------------------------------【non-member functions】----------------------------------
+
 template <typename T, typename Alloc>
 inline bool operator==(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
 {
@@ -417,7 +471,8 @@ inline bool operator==(const List<T, Alloc>& lhs, const List<T, Alloc>& rhs)
     // const_iterator end2 = rhs.end();
     // const_iterator i1 = lhs.begin();
     // const_iterator i2 = rhs.begin();    
-    // while (i1 != end1 && i2 != end2 && *i1 == *i1) {
+    // while (i1 != end1 && i2 != end2 && *i1 == *i1)
+    // {
     // 	++i1;
     // 	++i2;
     // }    
