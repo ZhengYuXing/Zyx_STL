@@ -33,6 +33,14 @@ private:
 public:
     Vector() : start(nullptr), finish(nullptr), end_of_storage(nullptr) { }
 
+    explicit Vector(size_type n)
+      : start(nullptr), finish(nullptr), end_of_storage(nullptr)
+    {
+        start = allocate(n);
+        finish = uninitialized_fill_n(start, n, T());
+        end_of_storage = start + n;       
+    }
+
     Vector(size_type n, const T& val) 
       : start(nullptr), finish(nullptr), end_of_storage(nullptr)
     {
@@ -41,25 +49,15 @@ public:
         end_of_storage = start + n;
     }
 
-    explicit Vector(size_type n) 
-      : start(nullptr), finish(nullptr), end_of_storage(nullptr)
-    {
-        start = allocate(n);
-        finish = uninitialized_fill_n(start, n, T());
-        end_of_storage = start + n;       
-    }
-
     template <typename InputIterator>
-    Vector(InputIterator first, InputIterator last) 
+    Vector(InputIterator first, InputIterator last)
       : start(nullptr), finish(nullptr), end_of_storage(nullptr)
     {
-        const size_type n = distance(first, last);
-        start = allocate(n);
-        finish = uninitialized_copy(first, last, start);
-        end_of_storage = start + n;        
+        typedef _is_integer<InputIterator>::integral integral;
+        initialize_aux(first, last, integral());
     }
 
-    Vector(const Vector& x) 
+    Vector(const Vector& x)
       : start(nullptr), finish(nullptr), end_of_storage(nullptr)
     {
         const size_type n = x.size();
@@ -114,6 +112,19 @@ public:
     }
 
 public:
+    void assign(size_type n, const T& val)
+    {
+        fill_assign(n, val);
+    }
+
+    template <typename InputIterator>
+    void assign(InputIterator first, InputIterator last)
+    {
+        typedef _is_integer<InputIterator>::integral integral;
+        assign_dispatch(first, last, integral());
+    }
+
+public:
     iterator begin() { return start;  }
     const_iterator begin() const { return start; }
     iterator end() { return finish;  }
@@ -160,19 +171,19 @@ public:
     iterator insert(iterator pos, const T& val)
     {
         const size_type n = pos - start;
-        if (pos == finish && finish != end_of_storage) 
+        if (pos == finish && finish != end_of_storage)
         {
             construct(finish, val);
             ++finish;
-        } 
-        else 
+        }
+        else
         {
-            insert_aux(finish, val);
+            insert_aux(pos, val);
         }
         return start + n;
     }
 
-    void insert(iterator pos, size_type n, const T& val) 
+    void insert(iterator pos, size_type n, const T& val)
     { 
         fill_insert(pos, n, val); 
     }
@@ -180,51 +191,8 @@ public:
     template <typename InputIterator>
     void insert(iterator pos, InputIterator first, InputIterator last)
     {
-        range_insert(pos, first, last);
-    }
-
-    template <typename InputIterator>
-    void assign(InputIterator first, InputIterator last)
-    {
-        const size_type n = last - first;
-        if (end_of_storage - start >= n) 
-        {
-            iterator result = uninitialized_copy(first, last, start);
-            if (result < finish)
-            {
-                destroy(result, finish);
-            }
-            finish = result;
-        }
-        else
-        {
-            destroy(start, finish);
-            deallocate(start, end_of_storage - start);            
-            start = allocate(n);
-            finish = uninitialized_copy(first, last, start);
-            end_of_storage = start + n;            
-        }
-    }
-
-    void assign(size_type n, const T& val)
-    {
-        if (end_of_storage - start >= n) 
-        {
-            iterator result = uninitialized_fill_n(start, n, val);
-            if (result < finish)
-            {
-                destroy(result, finish);
-            }
-            finish = result;
-        } 
-        else 
-        {
-            destroy(start, finish);
-            deallocate(start, end_of_storage - start);
-            start = allocate(n);
-            finish = uninitialized_fill_n(start, n, val);
-            end_of_storage = start + n;
-        }
+        typedef _is_integer<InputIterator>::integral integral;
+        insert_dispatch(pos, first, last, integral());
     }
 
     iterator erase(iterator pos)
@@ -262,7 +230,7 @@ public:
     { 
         resize(n, T()); 
     }
-
+    
     void reserve(size_type n)
     {
         if (capacity() < n) 
@@ -301,20 +269,96 @@ private:
         return result;
     }
 
+    template <typename Integer>
+    void initialize_aux(Integer n, Integer val, _true_type)
+    {
+        start = allocate(n);
+        finish = uninitialized_fill_n(start, n, val);
+        end_of_storage = start + n;
+    }
+
+    template <typename InputIterator>
+    void initialize_aux(InputIterator first, InputIterator last, _false_type)
+    {
+        const size_type n = distance(first, last);
+        start = allocate(n);
+        finish = uninitialized_copy(first, last, start);
+        end_of_storage = start + n;
+    }
+
+    void fill_assign(size_type n, const T& val)
+    {
+        if (n > capacity())
+        {
+            Vector tmp(n, val);
+            tmp.swap(*this);
+        }
+        else if (n > size())
+        {
+           fill(start, finish, val);
+           finish = uninitialized_fill_n(finish, size() - n, val);
+        }
+        else
+        {
+            erase(fill_n(start, n, val), finish);
+        }
+    }
+
+    template <typename Integer>
+    void assign_dispatch(Integer n, Integer val, _true_type)
+    {
+        fill_assign(n, val);
+    }
+
+    template <typename InputIterator>
+    void assign_dispatch(InputIterator first, InputIterator last, _false_type)
+    {
+        size_type n = distance(first, last);
+        if (n > capacity())
+        {
+            iterator tmp = allocate_and_copy(n, first, last);
+            destroy(start, finish);
+            deallocate(start, end_of_storage - start);
+            start = tmp;
+            finish = start + n;
+            end_of_storage = start + n;
+        }
+        else if (n > size())
+        {
+            InputIterator mid = first;
+            advance(mid, size());
+            copy(first, mid, start);
+            finish = uninitialized_copy(mid, last, finish);
+        }
+        else
+        {
+            iterator new_finish = copy(first, last, start);
+            destroy(new_finish, finish);
+            finish = new_finish;
+        }
+    }
+
     void insert_aux(iterator pos, const T& val);
+
     void fill_insert(iterator pos, size_type n, const T& val);
 
-    template <typename ForwardIterator>
-    void range_insert(iterator pos, ForwardIterator first, ForwardIterator last);
+    template <typename Integer>
+    void insert_dispatch(iterator pos, Integer n, Integer val, _true_type)
+    {
+        fill_insert(pos, n, val);
+    }
 
-    // template <typename InputIterator>
-    // void range_insert(iterator pos, InputIterator first, InputIterator last)
-    // {
-    //     for (; first != last; ++first) {
-    //         pos = insert(pos, *first);
-    //         ++pos;
-    //     }
-    // }
+    template <typename InputIterator>
+    void insert_dispatch(iterator pos, InputIterator first, InputIterator last, _false_type)
+    {
+        range_insert(pos, first, last, iterator_category(first));
+    }
+
+    template <typename InputIterator>
+    void range_insert(iterator pos, InputIterator first, InputIterator last, input_iterator_tag);
+
+    template <typename ForwardIterator>
+    void range_insert(iterator pos, ForwardIterator first, ForwardIterator last, forward_iterator_tag);
 
 private:
     iterator start;
@@ -325,27 +369,27 @@ private:
 template <typename T, typename Alloc>
 void Vector<T, Alloc>::insert_aux(iterator pos, const T& val)
 {
-    if (finish != end_of_storage) 
+    if (finish != end_of_storage)
     {
         construct(finish, *(finish - 1));
         ++finish;
         copy_backward(pos, finish - 2, finish - 1);
         *pos = val;
-    } 
-    else 
+    }
+    else
     {
         const size_type old_size = size();
         const size_type len = old_size != 0 ? 2 * old_size : 1;
         iterator new_start = allocate(len);
         iterator new_finish = new_start;
-        try 
+        try
         {
             new_finish = uninitialized_copy(start, pos, new_start);
             construct(new_finish, val);
             ++new_finish;
             new_finish = uninitialized_copy(pos, finish, new_finish);
-        } 
-        catch (...) 
+        }
+        catch (...)
         {
             destroy(new_start, new_finish);
             deallocate(new_start, len);
@@ -412,8 +456,19 @@ void Vector<T, Alloc>::fill_insert(iterator pos, size_type n, const T& val)
 }
 
 template <typename T, typename Alloc>
+template <typename InputIterator>
+void Vector<T, Alloc>::range_insert(iterator pos, InputIterator first, InputIterator last, input_iterator_tag)
+{
+    for (; first != last; ++first)
+    {
+        pos = insert(pos, *first);
+        ++pos;
+    }
+}
+
+template <typename T, typename Alloc>
 template <typename ForwardIterator>
-void Vector<T, Alloc>::range_insert(iterator pos, ForwardIterator first, ForwardIterator last)
+void Vector<T, Alloc>::range_insert(iterator pos, ForwardIterator first, ForwardIterator last, forward_iterator_tag)
 {
     if (first != last) 
     {
