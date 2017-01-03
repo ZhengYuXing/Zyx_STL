@@ -230,7 +230,7 @@ public:
     { 
         resize(n, T()); 
     }
-    
+
     void reserve(size_type n)
     {
         if (capacity() < n) 
@@ -258,8 +258,15 @@ public:
     }
 
 private:
-    iterator allocate(size_type n) { return data_allocator::allocate(n); }
-    void deallocate(iterator p, size_type n) { data_allocator::deallocate(p, n); }
+    iterator allocate(size_type n)
+    { 
+        return data_allocator::allocate(n); 
+    }
+
+    void deallocate(iterator p, size_type n)
+    { 
+        data_allocator::deallocate(p, n); 
+    }
 
     template <typename ForwardIterator>
     iterator allocate_and_copy(size_type n, ForwardIterator first, ForwardIterator last)
@@ -280,29 +287,16 @@ private:
     template <typename InputIterator>
     void initialize_aux(InputIterator first, InputIterator last, _false_type)
     {
-        const size_type n = distance(first, last);
-        start = allocate(n);
-        finish = uninitialized_copy(first, last, start);
-        end_of_storage = start + n;
+        range_initialize(first, last, iterator_category(first));
     }
 
-    void fill_assign(size_type n, const T& val)
-    {
-        if (n > capacity())
-        {
-            Vector tmp(n, val);
-            tmp.swap(*this);
-        }
-        else if (n > size())
-        {
-           fill(start, finish, val);
-           finish = uninitialized_fill_n(finish, size() - n, val);
-        }
-        else
-        {
-            erase(fill_n(start, n, val), finish);
-        }
-    }
+    template <typename InputIterator>
+    void range_initialize(InputIterator first, InputIterator last, input_iterator_tag);
+
+    template <typename ForwardIterator>
+    void range_initialize(ForwardIterator first, ForwardIterator last, forward_iterator_tag);
+
+    void fill_assign(size_type n, const T& val);
 
     template <typename Integer>
     void assign_dispatch(Integer n, Integer val, _true_type)
@@ -313,30 +307,14 @@ private:
     template <typename InputIterator>
     void assign_dispatch(InputIterator first, InputIterator last, _false_type)
     {
-        size_type n = distance(first, last);
-        if (n > capacity())
-        {
-            iterator tmp = allocate_and_copy(n, first, last);
-            destroy(start, finish);
-            deallocate(start, end_of_storage - start);
-            start = tmp;
-            finish = start + n;
-            end_of_storage = start + n;
-        }
-        else if (n > size())
-        {
-            InputIterator mid = first;
-            advance(mid, size());
-            copy(first, mid, start);
-            finish = uninitialized_copy(mid, last, finish);
-        }
-        else
-        {
-            iterator new_finish = copy(first, last, start);
-            destroy(new_finish, finish);
-            finish = new_finish;
-        }
+        assign_aux(first, last, iterator_category(first));
     }
+
+    template <typename InputIterator>
+    void assign_aux(InputIterator first, InputIterator last, input_iterator_tag);
+
+    template <typename ForwardIterator>
+    void assign_aux(ForwardIterator first, ForwardIterator last, forward_iterator_tag);    
 
     void insert_aux(iterator pos, const T& val);
 
@@ -365,6 +343,94 @@ private:
     iterator finish;
     iterator end_of_storage;
 };
+
+template <typename T, typename Alloc>
+template <typename InputIterator>
+void Vector<T, Alloc>::range_initialize(InputIterator first, InputIterator last, input_iterator_tag)
+{
+    for (; first != last; ++first)
+    {
+        push_back(*first);
+    }
+}
+
+template <typename T, typename Alloc>
+template <typename ForwardIterator>
+void Vector<T, Alloc>::range_initialize(ForwardIterator first, ForwardIterator last, forward_iterator_tag)
+{
+    const size_type n = distance(first, last);
+    start = allocate(n);
+    finish = uninitialized_copy(first, last, start);
+    end_of_storage = start + n;
+}
+
+template <typename T, typename Alloc>
+void Vector<T, Alloc>::fill_assign(size_type n, const T& val)
+{
+    if (n > capacity())
+    {
+        Vector tmp(n, val);
+        tmp.swap(*this);
+    }
+    else if (n > size())
+    {
+       fill(start, finish, val);
+       finish = uninitialized_fill_n(finish, size() - n, val);
+    }
+    else
+    {
+        erase(fill_n(start, n, val), finish);
+    }
+}
+
+template <typename T, typename Alloc>
+template <typename InputIterator>
+void Vector<T, Alloc>::assign_aux(InputIterator first, InputIterator last, input_iterator_tag)
+{
+    iterator cur = start;
+    for (; first != last && cur != finish; ++first, ++cur)
+    {
+        *cur = *first;
+    }
+
+    if (first == last)
+    {
+        erase(cur, finish);
+    }
+    else
+    {
+        insert(finish, first, last);
+    }
+}
+
+template <typename T, typename Alloc>
+template <typename ForwardIterator>
+void Vector<T, Alloc>::assign_aux(ForwardIterator first, ForwardIterator last, forward_iterator_tag)
+{
+    size_type n = distance(first, last);
+    if (n > capacity())
+    {
+        iterator tmp = allocate_and_copy(n, first, last);
+        destroy(start, finish);
+        deallocate(start, end_of_storage - start);
+        start = tmp;
+        finish = start + n;
+        end_of_storage = start + n;
+    }
+    else if (n > size())
+    {
+        ForwardIterator mid = first;
+        advance(mid, size());
+        copy(first, mid, start);
+        finish = uninitialized_copy(mid, last, finish);
+    }
+    else
+    {
+        iterator new_finish = copy(first, last, start);
+        destroy(new_finish, finish);
+        finish = new_finish;
+    }
+}
 
 template <typename T, typename Alloc>
 void Vector<T, Alloc>::insert_aux(iterator pos, const T& val)
