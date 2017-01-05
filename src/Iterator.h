@@ -143,6 +143,16 @@ void __advance(RandomAccessIterator& iter, Distance n, random_access_iterator_ta
     iter += n;
 }
 
+//----------------------------------【next() function】--------------------------------------
+
+template <typename InputIterator>
+InputIterator next(InputIterator iter,
+                   typename iterator_traits<InputIterator>::difference_type n = 1)
+{
+    advance(iter, n);
+    return iter;
+}
+
 
 //-----------------------------【back_insert_iteator class】---------------------------------
 
