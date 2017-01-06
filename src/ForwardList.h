@@ -530,6 +530,26 @@ void ForwardList<T, Alloc>::splice_after(const_iterator pos, ForwardList<T, Allo
 }
 
 template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::merge(ForwardList<T, Alloc>& other)
+{
+    list_node* p1 = &head;
+    while (p1->next != nullptr && other.head.next != nullptr)
+    {
+        if (other.head.next->data < p1->next->data)
+        {
+            splice_after(p1, &other.head, other.head.next);
+        }
+        p1 = p1->next;
+    }
+
+    if (other.head.next != nullptr)
+    {
+        p1->next = other.head.next;
+        other.head.next = nullptr;
+    }
+}
+
+template <typename T, typename Alloc>
 void ForwardList<T, Alloc>::reverse()
 {
     if (head.next != nullptr)
