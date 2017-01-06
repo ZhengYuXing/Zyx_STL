@@ -3,6 +3,16 @@
 
 #include "../src/ForwardList.h"
 
+bool is_odd(int val)
+{
+    return val % 2 == 1;
+}
+
+bool is_twice(int val1, int val2)
+{
+    return val1 == val2 * 2;
+}
+
 TEST_CASE("test ForwardList.h", "[ForwardList]")
 {
     SECTION("test ForwardList() function")
@@ -372,5 +382,196 @@ TEST_CASE("test ForwardList.h", "[ForwardList]")
 
         ++itr;
         REQUIRE(*itr == 7);
+    }
+
+    SECTION("test remove(const T& value) function")
+    {
+        Zyx::ForwardList<int> ilist;
+        ilist.push_front(3);
+        ilist.push_front(5);
+        ilist.push_front(7);
+        ilist.push_front(5);
+
+        ilist.remove(5);
+        REQUIRE(ilist.size() == 2);
+
+        auto itr = ilist.begin();
+        REQUIRE(*itr == 7);
+
+        ++itr;
+        REQUIRE(*itr == 3);
+    }
+
+    SECTION("test remove_if(UnaryPredicate pred) function")
+    {
+        Zyx::ForwardList<int> ilist;
+        ilist.push_front(3);
+        ilist.push_front(5);
+        ilist.push_front(7);
+        ilist.push_front(6);
+
+        ilist.remove_if(is_odd);
+        REQUIRE(ilist.size() == 1);
+
+        auto itr = ilist.begin();
+        REQUIRE(*itr == 6);
+    }
+
+    SECTION("test unique() function")
+    {
+        Zyx::ForwardList<int> ilist;
+        ilist.push_front(3);
+        ilist.push_front(3);        
+        ilist.push_front(5);
+        ilist.push_front(7);
+        ilist.push_front(7);
+
+        ilist.unique();
+        REQUIRE(ilist.size() == 3);
+
+        auto itr = ilist.begin();
+        REQUIRE(*itr == 7);
+
+        ++itr;
+        REQUIRE(*itr == 5);
+
+        ++itr;
+        REQUIRE(*itr == 3);
+    }
+
+    SECTION("test unique(BinaryPredicate pred) function")
+    {
+        Zyx::ForwardList<int> ilist;
+        ilist.push_front(3);
+        ilist.push_front(6);        
+        ilist.push_front(12);
+        ilist.push_front(7);
+        ilist.push_front(14);
+
+        ilist.unique(is_twice);
+        REQUIRE(ilist.size() == 3);
+
+        auto itr = ilist.begin();
+        REQUIRE(*itr == 14);
+
+        ++itr;
+        REQUIRE(*itr == 12);
+
+        ++itr;
+        REQUIRE(*itr == 3);
+    }
+
+    SECTION("test splice_after(const_iterator pos, ForwardList& other) function")
+    {
+    	int arr1[] = { 1, 2, 3, 4, 5 };
+        int arr2[] = { 10, 11, 12 };
+
+        Zyx::ForwardList<int> ilist1(arr1, arr1 + 5);
+        Zyx::ForwardList<int> ilist2(arr2, arr2 + 3);
+
+        ilist2.splice_after(ilist2.begin(), ilist1);
+
+        REQUIRE(ilist1.empty());
+        REQUIRE(ilist2.size() == 8);
+
+        auto itr = ilist2.begin();
+        REQUIRE(*itr == 10);
+
+        ++itr;
+        REQUIRE(*itr == 1);
+
+        ++itr;
+        REQUIRE(*itr == 2);
+
+        ++itr;
+        REQUIRE(*itr == 3);
+
+        ++itr;
+        REQUIRE(*itr == 4);
+
+        ++itr;
+        REQUIRE(*itr == 5);
+
+        ++itr;
+        REQUIRE(*itr == 11);
+
+        ++itr;
+        REQUIRE(*itr == 12);
+    }
+
+    SECTION("test splice_after(const_iterator pos, ForwardList& other, const_iterator it) function")
+    {
+    	int arr1[] = { 1, 2, 3, 4, 5 };
+        int arr2[] = { 10, 11, 12 };
+
+        Zyx::ForwardList<int> ilist1(arr1, arr1 + 5);
+        Zyx::ForwardList<int> ilist2(arr2, arr2 + 3);
+
+        ilist2.splice_after(ilist2.begin(), ilist1, Zyx::next(ilist1.begin(), 1));
+
+        REQUIRE(ilist1.size() == 2);
+        REQUIRE(ilist2.size() == 6);
+
+        auto itr = ilist1.begin();
+        REQUIRE(*itr == 1);
+
+        ++itr;
+        REQUIRE(*itr == 2);
+
+        itr = ilist2.begin();
+        REQUIRE(*itr == 10);
+
+        ++itr;
+        REQUIRE(*itr == 3);
+
+        ++itr;
+        REQUIRE(*itr == 4);
+
+        ++itr;
+        REQUIRE(*itr == 5);
+
+        ++itr;
+        REQUIRE(*itr == 11);
+
+        ++itr;
+        REQUIRE(*itr == 12);
+    }
+
+    SECTION("test splice_after(const_iterator pos, ForwardList& other) function")
+    {
+    	int arr1[] = { 1, 2, 3, 4, 5 };
+        int arr2[] = { 10, 11, 12 };
+
+        Zyx::ForwardList<int> ilist1(arr1, arr1 + 5);
+        Zyx::ForwardList<int> ilist2(arr2, arr2 + 3);
+
+        ilist2.splice_after(ilist2.begin(), ilist1, Zyx::next(ilist1.begin(), 1), Zyx::next(ilist1.begin(), 3));
+
+        REQUIRE(ilist1.size() == 4);
+        REQUIRE(ilist2.size() == 4);
+
+        auto itr = ilist1.begin();
+        REQUIRE(*itr == 1);
+
+        ++itr;
+        REQUIRE(*itr == 2);
+
+        ++itr;
+        REQUIRE(*itr == 4);
+
+        ++itr;
+        REQUIRE(*itr == 5);
+
+        itr = ilist2.begin();
+        REQUIRE(*itr == 10);
+
+        ++itr;
+        REQUIRE(*itr == 3);
+        
+        ++itr;
+        REQUIRE(*itr == 11);
+
+        ++itr;
+        REQUIRE(*itr == 12);
     }
 }
