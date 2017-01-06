@@ -523,9 +523,28 @@ template <typename T, typename Alloc>
 void ForwardList<T, Alloc>::splice_after(const_iterator pos, ForwardList<T, Alloc>& other, 
                                          const_iterator first, const_iterator last)
 {
-	if (first != last)
-	{
+    if (first != last)
+    {
         splice_after(pos.node, first.node, previous(&other.head, last.node));
+    }
+}
+
+template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::reverse()
+{
+    if (head.next != nullptr)
+    {
+        list_node* prev = head.next;
+        list_node* cur = prev->next;
+        prev->next = nullptr;
+        while (cur != nullptr)
+        {
+            list_node* tmp = cur->next;
+            cur->next = prev;
+            prev = cur;
+            cur = tmp;
+        }
+        head.next = prev;
     }
 }
 
@@ -545,7 +564,7 @@ ForwardList<T, Alloc>::create_node(const T& val)
 template <typename T, typename Alloc>
 void ForwardList<T, Alloc>::destroy_node(list_node* p)
 {
-	destroy(&p->data);
+    destroy(&p->data);
     list_node_allocator::deallocate(p);
 }
 
