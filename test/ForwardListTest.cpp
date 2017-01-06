@@ -537,7 +537,7 @@ TEST_CASE("test ForwardList.h", "[ForwardList]")
         REQUIRE(*itr == 12);
     }
 
-    SECTION("test splice_after(const_iterator pos, ForwardList& other) function")
+    SECTION("test splice_after(const_iterator pos, ForwardList<T, Alloc>& other, const_iterator first, const_iterator last) function")
     {
     	int arr1[] = { 1, 2, 3, 4, 5 };
         int arr2[] = { 10, 11, 12 };
@@ -567,11 +567,31 @@ TEST_CASE("test ForwardList.h", "[ForwardList]")
 
         ++itr;
         REQUIRE(*itr == 3);
-        
+
         ++itr;
         REQUIRE(*itr == 11);
 
         ++itr;
         REQUIRE(*itr == 12);
+    }
+
+    SECTION("test reverse() function")
+    {
+        Zyx::ForwardList<int> ilist;
+        ilist.push_front(3);
+        ilist.push_front(5);
+        ilist.push_front(7);
+
+        ilist.reverse();
+        REQUIRE(ilist.size() == 3);
+
+        auto itr = ilist.begin();
+        REQUIRE(*itr == 3);
+
+        ++itr;
+        REQUIRE(*itr == 5);
+
+        ++itr;
+        REQUIRE(*itr == 7);
     }
 }
