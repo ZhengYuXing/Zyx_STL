@@ -594,4 +594,42 @@ TEST_CASE("test ForwardList.h", "[ForwardList]")
         ++itr;
         REQUIRE(*itr == 7);
     }
+
+    SECTION("test splice_after(const_iterator pos, ForwardList<T, Alloc>& other, const_iterator first, const_iterator last) function")
+    {
+    	int arr1[] = { 1, 2, 8, 14, 15 };
+        int arr2[] = { 6, 11, 12 };
+
+        Zyx::ForwardList<int> ilist1(arr1, arr1 + 5);
+        Zyx::ForwardList<int> ilist2(arr2, arr2 + 3);
+
+        ilist1.merge(ilist2);
+
+        REQUIRE(ilist1.size() == 8);
+        REQUIRE(ilist2.size() == 0);
+
+        auto itr = ilist1.begin();
+        REQUIRE(*itr == 1);
+
+        ++itr;
+        REQUIRE(*itr == 2);
+
+        ++itr;
+        REQUIRE(*itr == 6);
+
+        ++itr;
+        REQUIRE(*itr == 8);
+
+        ++itr;
+        REQUIRE(*itr == 11);
+
+        ++itr;
+        REQUIRE(*itr == 12);
+
+        ++itr;
+        REQUIRE(*itr == 14);
+
+        ++itr;
+        REQUIRE(*itr == 15);
+    }
 }
