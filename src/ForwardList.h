@@ -164,6 +164,8 @@ private:
 
     list_node* make_link(list_node* prev_node, list_node* next_node);
 
+    list_node* previous(list_node* pos, list_node* node);
+
     void fill_assign(size_type n, const T& val);
 
     template <typename Integer>
@@ -186,6 +188,8 @@ private:
 
     list_node* erase_after(list_node* pos);
     list_node* erase_after(list_node* before_first, list_node* last);
+
+    void splice_after(list_node* pos, list_node* before_first, list_node* before_last);
 
 private:
     list_node head;
@@ -223,7 +227,7 @@ ForwardList<T, Alloc>::ForwardList(InputIterator first, InputIterator last)
 }
 
 template <typename T, typename Alloc>
-ForwardList<T, Alloc>::ForwardList(const ForwardList& other)
+ForwardList<T, Alloc>::ForwardList(const ForwardList<T, Alloc>& other)
 {
     head.next = nullptr;
     insert_after_range(&head, other.begin(), other.end());
@@ -427,6 +431,105 @@ void ForwardList<T, Alloc>::swap(ForwardList<T, Alloc>& other)
     Zyx::swap(head.next, other.head.next);
 }
 
+template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::remove(const T& value)
+{
+    list_node* cur = &head;
+    while (cur->next != nullptr)
+    {
+        if (cur->next->data == value)
+        {
+            erase_after(cur);
+        }
+        else
+        {
+            cur = cur->next;
+        }
+    }
+}
+
+template <typename T, typename Alloc>
+template <typename UnaryPredicate>
+void ForwardList<T, Alloc>::remove_if(UnaryPredicate pred)
+{
+    list_node* cur = &head;
+    while (cur->next != nullptr)
+    {
+        if (pred(cur->next->data))
+        {
+            erase_after(cur);
+        }
+        else
+        {
+            cur = cur->next;
+        }
+    }
+}
+
+template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::unique()
+{
+    list_node* cur = head.next;
+    if (cur != nullptr)
+    {
+        while (cur->next != nullptr)
+        {
+            if (cur->data == cur->next->data)
+            {
+                erase_after(cur);
+            }
+            else
+            {
+                cur = cur->next;
+            }
+        }
+    }
+}
+
+template <typename T, typename Alloc>
+template <typename BinaryPredicate>
+void ForwardList<T, Alloc>::unique(BinaryPredicate pred)
+{
+    list_node* cur = head.next;
+    if (cur != nullptr)
+    {
+        while (cur->next != nullptr)
+        {
+            if (pred(cur->data, cur->next->data))
+            {
+                erase_after(cur);
+            }
+            else
+            {
+                cur = cur->next;
+            }
+        }
+    }
+}
+
+template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::splice_after(const_iterator pos, ForwardList<T, Alloc>& other)
+{
+    splice_after(pos.node, &other.head, previous(&other.head, nullptr));
+}
+
+template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::splice_after(const_iterator pos, ForwardList<T, Alloc>& other, const_iterator it)
+{
+    splice_after(pos.node, it.node, previous(&other.head, nullptr));
+}
+
+template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::splice_after(const_iterator pos, ForwardList<T, Alloc>& other, 
+                                         const_iterator first, const_iterator last)
+{
+	if (first != last)
+	{
+        splice_after(pos.node, first.node, previous(&other.head, last.node));
+    }
+}
+
+
 //-----------------------------------【private functions】------------------------------------
 
 template <typename T, typename Alloc>
@@ -453,6 +556,17 @@ ForwardList<T, Alloc>::make_link(list_node* prev_node, list_node* new_node)
     new_node->next = prev_node->next;
     prev_node->next = new_node;
     return new_node;
+}
+
+template <typename T, typename Alloc>
+typename ForwardList<T, Alloc>::list_node* 
+ForwardList<T, Alloc>::previous(list_node* pos, list_node* node)
+{
+    while (pos->next != node)
+    {
+        pos = pos->next;
+    }
+    return pos;
 }
 
 template <typename T, typename Alloc>
@@ -582,6 +696,18 @@ ForwardList<T, Alloc>::erase_after(list_node* before_first, list_node* last)
     }
     before_first->next = last;
     return last;
+}
+
+template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::splice_after(list_node* pos, list_node* before_first, list_node* before_last)
+{
+    if (pos != before_first && pos != before_last)
+    {
+        list_node* first = before_first->next;
+        before_first->next = before_last->next;
+        before_last->next = pos->next;
+        pos->next = first;
+    }
 }
 
 }
