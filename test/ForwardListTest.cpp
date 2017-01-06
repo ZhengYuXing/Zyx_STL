@@ -595,7 +595,7 @@ TEST_CASE("test ForwardList.h", "[ForwardList]")
         REQUIRE(*itr == 7);
     }
 
-    SECTION("test splice_after(const_iterator pos, ForwardList<T, Alloc>& other, const_iterator first, const_iterator last) function")
+    SECTION("test merge() function")
     {
     	int arr1[] = { 1, 2, 8, 14, 15 };
         int arr2[] = { 6, 11, 12 };
