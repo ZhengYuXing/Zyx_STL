@@ -2,6 +2,7 @@
 #include "catch.hpp"
 
 #include "../src/ForwardList.h"
+#include "../src/Functional.h"
 
 bool is_odd(int val)
 {
@@ -631,5 +632,91 @@ TEST_CASE("test ForwardList.h", "[ForwardList]")
 
         ++itr;
         REQUIRE(*itr == 15);
+    }
+
+    SECTION("test merge(Compare comp) function")
+    {
+    	int arr1[] = { 13, 12, 8, 5, 4 };
+        int arr2[] = { 11, 6, 2 };
+
+        Zyx::ForwardList<int> ilist1(arr1, arr1 + 5);
+        Zyx::ForwardList<int> ilist2(arr2, arr2 + 3);
+
+        ilist1.merge(ilist2, Zyx::greater<int>());
+
+        REQUIRE(ilist1.size() == 8);
+        REQUIRE(ilist2.size() == 0);
+
+        auto itr = ilist1.begin();
+        REQUIRE(*itr == 13);
+
+        ++itr;
+        REQUIRE(*itr == 12);
+
+        ++itr;
+        REQUIRE(*itr == 11);
+
+        ++itr;
+        REQUIRE(*itr == 8);
+
+        ++itr;
+        REQUIRE(*itr == 6);
+
+        ++itr;
+        REQUIRE(*itr == 5);
+
+        ++itr;
+        REQUIRE(*itr == 4);
+
+        ++itr;
+        REQUIRE(*itr == 2);
+    }
+
+    SECTION("test sort() function")
+    {
+    	int arr[] = { 11, 2, 8, 4, 5 };
+        Zyx::ForwardList<int> ilist(arr, arr + 5);
+
+        ilist.sort();
+        REQUIRE(ilist.size() == 5);
+
+        auto itr = ilist.begin();
+        REQUIRE(*itr == 2);
+
+        ++itr;
+        REQUIRE(*itr == 4);
+
+        ++itr;
+        REQUIRE(*itr == 5);
+
+        ++itr;
+        REQUIRE(*itr == 8);
+
+        ++itr;
+        REQUIRE(*itr == 11);
+    }
+
+    SECTION("test sort(Compare comp) function")
+    {
+    	int arr[] = { 11, 2, 8, 4, 5 };
+        Zyx::ForwardList<int> ilist(arr, arr + 5);
+
+        ilist.sort(Zyx::greater<int>());
+        REQUIRE(ilist.size() == 5);
+
+        auto itr = ilist.begin();
+        REQUIRE(*itr == 11);
+
+        ++itr;
+        REQUIRE(*itr == 8);
+
+        ++itr;
+        REQUIRE(*itr == 5);
+
+        ++itr;
+        REQUIRE(*itr == 4);
+
+        ++itr;
+        REQUIRE(*itr == 2);
     }
 }
