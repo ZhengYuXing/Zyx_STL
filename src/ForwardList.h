@@ -135,28 +135,31 @@ public:
     void swap(ForwardList& other);
 
 public:
-	void remove(const T& value);
+    void remove(const T& value);
 
-	template <typename UnaryPredicate>
-	void remove_if(UnaryPredicate pred);
+    template <typename UnaryPredicate>
+    void remove_if(UnaryPredicate pred);
 
-	void unique();
+    void unique();
 
-	template <typename BinaryPredicate>
-	void unique(BinaryPredicate pred);
+    template <typename BinaryPredicate>
+    void unique(BinaryPredicate pred);
 
     void splice_after(const_iterator pos, ForwardList& other);
     void splice_after(const_iterator pos, ForwardList& other, const_iterator it);
     void splice_after(const_iterator pos, ForwardList& other, const_iterator first, const_iterator last);
 
-	void merge(ForwardList& other);
+    void merge(ForwardList& other);
 
-	void reverse();
+    template <typename Compare>
+    void  merge(ForwardList& other, Compare comp);
 
-	void sort();
+    void sort();
 
-	template <typename Compare>
-	void sort(Compare comp);
+    template <typename Compare>
+    void sort(Compare comp);
+
+    void reverse();
 
 private:
     list_node* create_node(const T& val);
@@ -546,6 +549,100 @@ void ForwardList<T, Alloc>::merge(ForwardList<T, Alloc>& other)
     {
         p1->next = other.head.next;
         other.head.next = nullptr;
+    }
+}
+
+template <typename T, typename Alloc>
+template <typename Compare>
+void ForwardList<T, Alloc>::merge(ForwardList& other, Compare comp)
+{
+    list_node* p1 = &head;
+    while (p1->next != nullptr && other.head.next != nullptr)
+    {
+        if (comp(other.head.next->data, p1->next->data))
+        {
+            splice_after(p1, &other.head, other.head.next);
+        }
+        p1 = p1->next;
+    }
+
+    if (other.head.next != nullptr)
+    {
+        p1->next = other.head.next;
+        other.head.next = nullptr;
+    }
+}
+
+template <typename T, typename Alloc>
+void ForwardList<T, Alloc>::sort()
+{
+    if (head.next != nullptr && head.next->next != nullptr)
+    {
+    	ForwardList carry;
+    	ForwardList counter[64];
+    	int fill = 0;
+
+        while (!empty())
+        {
+            splice_after(&carry.head, &head, head.next);
+            int i = 0;
+            while (i < fill && !counter[i].empty())
+            {
+                carry.merge(counter[i]);
+                // counter[i].merge(carry);
+                // carry.swap(counter[i]);
+                i++;
+            }
+            carry.swap(counter[i]);
+
+            if (i == fill)
+            {
+                fill++;
+            }
+        }
+
+        for (int i = 1; i < fill; i++)
+        {
+            counter[i].merge(counter[i - 1]);
+        }
+        swap(counter[fill - 1]);
+    }
+}
+
+template <typename T, typename Alloc>
+template <typename Compare>
+void ForwardList<T, Alloc>::sort(Compare comp)
+{
+    if (head.next != nullptr && head.next->next != nullptr)
+    {
+    	ForwardList carry;
+    	ForwardList counter[64];
+    	int fill = 0;
+
+        while (!empty())
+        {
+            splice_after(&carry.head, &head, head.next);
+            int i = 0;
+            while (i < fill && !counter[i].empty())
+            {
+                carry.merge(counter[i], comp);
+                // counter[i].merge(carry);
+                // carry.swap(counter[i]);
+                i++;
+            }
+            carry.swap(counter[i]);
+
+            if (i == fill)
+            {
+                fill++;
+            }
+        }
+
+        for (int i = 1; i < fill; i++)
+        {
+            counter[i].merge(counter[i - 1], comp);
+        }
+        swap(counter[fill - 1]);
     }
 }
 
