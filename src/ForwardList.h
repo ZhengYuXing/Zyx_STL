@@ -5,6 +5,7 @@
 #include "TypeTraits.h"
 #include "Alloc.h"
 #include "Construct.h"
+#include "Algorithm.h"
 #include "Utility.h"
 
 namespace Zyx
@@ -844,6 +845,63 @@ void ForwardList<T, Alloc>::splice_after(list_node* pos, list_node* before_first
         before_last->next = pos->next;
         pos->next = first;
     }
+}
+
+
+//----------------------------------【non-member functions】----------------------------------
+
+template <typename T, typename Alloc>
+inline bool operator==(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs)
+{
+    return lhs.size() == rhs.size() && equal(lhs.begin(), lhs.end(), rhs.begin()); 
+
+    // typedef typename ForwardList<T, Alloc>::const_iterator const_iterator;
+    // const_iterator end1 = lhs.end();
+    // const_iterator end2 = rhs.end();
+    // const_iterator i1 = lhs.begin();
+    // const_iterator i2 = rhs.begin();    
+    // while (i1 != end1 && i2 != end2 && *i1 == *i1)
+    // {
+    // 	++i1;
+    // 	++i2;
+    // }    
+    // return i1 == end1 && i2 == end2;
+}
+
+template <typename T, typename Alloc>
+inline bool operator!=(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs)
+{
+    return !(lhs == rhs);
+}
+
+template <typename T, typename Alloc>
+inline bool operator<(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs)
+{
+    return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <typename T, typename Alloc>
+inline bool operator>(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs)
+{
+    return rhs < lhs;
+}
+
+template <typename T, typename Alloc>
+inline bool operator<=(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs)
+{
+    return !(rhs < lhs);
+}
+
+template <typename T, typename Alloc>
+inline bool operator>=(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs)
+{
+    return !(lhs < rhs);
+}
+
+template <typename T, typename Alloc>
+inline void swap(ForwardList<T, Alloc>& lhs, ForwardList<T, Alloc>& rhs)
+{
+    lhs.swap(rhs);
 }
 
 }
