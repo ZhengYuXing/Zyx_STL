@@ -719,4 +719,37 @@ TEST_CASE("test ForwardList.h", "[ForwardList]")
         ++itr;
         REQUIRE(*itr == 2);
     }
+
+    SECTION("test operator==(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs) function")
+    {
+        int arr[] = { 3, 6, 9 };
+        Zyx::ForwardList<int> ilist1(arr, arr + 3);
+        Zyx::ForwardList<int> ilist2(arr, arr + 3);
+        REQUIRE(ilist1 == ilist2);
+    }
+
+    SECTION("test operator!=(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs) function")
+    {
+        int arr[] = { 3, 6, 9 };
+        Zyx::ForwardList<int> ilist1(arr, arr + 3);
+        Zyx::ForwardList<int> ilist2(arr, arr + 2);
+        REQUIRE(ilist1 != ilist2);
+    }
+
+    SECTION("test operator<(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs) function")
+    {
+        int arr[] = { 3, 6, 9 };
+        Zyx::ForwardList<int> ilist1(arr, arr + 2);
+        Zyx::ForwardList<int> ilist2(arr, arr + 3);
+        REQUIRE(ilist1 < ilist2);
+    }
+
+    SECTION("test operator>(const ForwardList<T, Alloc>& lhs, const ForwardList<T, Alloc>& rhs) function")
+    {
+    	int arr1[] = { 9, 2 };
+        int arr2[] = { 3, 6, 9 };
+        Zyx::ForwardList<int> ilist1(arr1, arr1 + 2);
+        Zyx::ForwardList<int> ilist2(arr2, arr2 + 3);
+        REQUIRE(ilist1 > ilist2);
+    }
 }
