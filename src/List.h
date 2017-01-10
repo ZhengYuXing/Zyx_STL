@@ -2,6 +2,7 @@
 #define ZYX_LIST 
 
 #include "Iterator.h"
+#include "TypeTraits.h"
 #include "Alloc.h"
 #include "Construct.h"
 #include "Algorithm.h"
@@ -31,12 +32,12 @@ struct __list_iterator
     typedef Ref                                       reference;
     typedef size_t                                    size_type;
     typedef ptrdiff_t                                 difference_type;
-    typedef __list_node<T>*                           link_type;
+    typedef __list_node<T>                            list_node;
  
-    link_type node;
+    list_node* node;
 
     __list_iterator() : node(nullptr) { }
-    __list_iterator(link_type x) : node(x) { }
+    __list_iterator(list_node* x) : node(x) { }
     __list_iterator(const iterator& x) : node(x.node) { }
 
     bool operator==(const self& x) const { return node == x.node; }
@@ -83,63 +84,41 @@ public:
     typedef T                                         value_type;
     typedef __list_iterator<T, T&, T*> 	              iterator;
     typedef __list_iterator<T, const T&, const T*>    const_iterator;
+    typedef reverse_iterator<const_iterator>          const_reverse_iterator;
+    typedef reverse_iterator<iterator>                reverse_iterator;    
     typedef T*                                        pointer;
     typedef const T*                                  const_pointer;
     typedef T& 	                                      reference;
     typedef const T&                                  const_reference;
     typedef size_t 	                                  size_type;
     typedef ptrdiff_t                                 difference_type;
-    typedef list_node*                                link_type;
 
 public:
     List() { empty_intialize(); }
 
-    // explicit List(size_type n) { default_initialize(n); }
-
-    List(size_type n, const value_type& val)
+    explicit List(size_type n)
     {
         empty_intialize();
-        fill_initialize(n, val);
+        insert(begin(), n, T());
+    }
+
+    List(size_type n, const T& val)
+    {
+        empty_intialize();
+        insert(begin(), n, val);
     }
 	
     template <typename InputIterator>
     List(InputIterator first, InputIterator last)
     {
         empty_intialize();
-        while (first != last)
-        {
-            push_back(*first);
-            ++first;
-        }
+        insert(begin(), first, last);
     }
 
-    List(const List& x)
+    List(const List& other)
     {
         empty_intialize();
-        for (const_iterator iter = x.begin(); iter != x.end(); ++iter)
-        {
-            push_back(*iter);
-        }
-    }
-
-    List& operator=(const List& x)
-    {
-        if (this != &x) 
-        {
-            List tmp(x);
-            swap(tmp);
-        }
-        return *this;
-        
-        // if (this != &x) 
-        // {
-        // 	clear();
-        // 	for (const_iterator iter = x.begin(); iter != x.end(); ++iter)
-        //     {
-        // 	    push_back(*iter);
-        //     }
-        // }
-        // return *this;		
+        insert(begin(), other.begin(), other.end());
     }
 
     ~List() 
@@ -149,12 +128,57 @@ public:
     }
 
 public:
+    List& operator=(const List& other)
+    {
+        if (this != &other)
+        {
+            iterator first1 = begin();
+            iterator last1 = end();
+            const_iterator first2 = other.begin();
+            const_iterator last2 = other.end();
+
+            while (first1 != last1 && first2 != last2)
+            {
+                *first1 = *first2;
+                ++first1;
+                ++first2;
+            }
+
+            if (first2 != last2)
+            {
+                insert(last1, first2, last2);
+            }
+            else
+            {
+                erase(first1, last1);
+            }
+        }
+
+        return *this;
+    }
+
+    void assign(size_type n, const T& val) { fill_assign(n, val); }
+
+    template <typename InputIterator>
+    void assign(InputIterator first, InputIterator last)
+    {
+        typedef _is_integer<InputIterator>::integral integral;
+        assign_dispatch(first, last, integral());        
+    }
+
+public:
     iterator begin() { return node->next; }
     const_iterator begin() const { return node->next; }  
 
     iterator end() { return node; }
     const_iterator end() const { return node; }   
-	
+
+    reverse_iterator rbegin() { return reverse_iterator(end()); }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+
+    reverse_iterator rend() { return reverse_iterator(begin()); }
+    const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+
     reference front() { return *begin(); }
     const_reference front() const { return *begin(); }
 	
@@ -165,15 +189,15 @@ public:
     size_type size() const { return distance(begin(), end()); }
 
 public:
-    void push_front(const value_type& val) { insert(begin(), val); }
-    void push_back(const value_type& val) { insert(end(), val); }
+    void push_front(const T& val) { insert(begin(), val); }
+    void push_back(const T& val) { insert(end(), val); }
 
     void pop_front() { erase(begin()); }
     void pop_back() { erase(--end()); }
 
-    iterator insert(iterator pos, const value_type& val)
+    iterator insert(iterator pos, const T& val)
     {
-        link_type tmp = create_node(val);
+        list_node* tmp = create_node(val);
         tmp->next = pos.node;
         tmp->prev = pos.node->prev;
         pos.node->prev->next = tmp;
@@ -181,23 +205,22 @@ public:
         return tmp;
     }
 
-    void insert(iterator pos, size_type n, const value_type& val)
+    void insert(iterator pos, size_type n, const T& val)
     {
-        List tmp(n, val);
-        splice(pos, tmp);
+        fill_insert(pos, n, val);
     }
 
     template <typename InputIterator>
     void insert(iterator pos, InputIterator first, InputIterator last)
     {
-        List tmp(first, last);
-        splice(pos, tmp);
+        typedef _is_integer<InputIterator>::integral integral;
+        insert_dispatch(pos, first, last, integral());
     }
 
     iterator erase(iterator pos)
     {
-        link_type prev_node = pos.node->prev;
-        link_type next_node = pos.node->next;
+        list_node* prev_node = pos.node->prev;
+        list_node* next_node = pos.node->next;
         prev_node->next = next_node;
         next_node->prev = prev_node;
         destroy_node(pos.node);
@@ -213,12 +236,33 @@ public:
         return last;
     }
 
+    void resize(size_type n) { resize(n, T()); }
+
+    void resize(size_type n, const T& val)
+    {
+        iterator cur = begin();
+        while (cur != end() && n > 0)
+        {
+            ++cur;
+            --n;
+        }
+
+        if (n > 0)
+        {
+            insert(end(), n, val);
+        }
+        else
+        {
+            erase(cur, end());
+        }
+    }
+
     void clear()
     {
-        link_type cur = node->next;
+        list_node* cur = node->next;
         while (cur != node)
         {
-            link_type tmp = cur;
+            list_node* tmp = cur;
             cur = cur->next;
             destroy_node(tmp);
         }
@@ -226,10 +270,10 @@ public:
         node->prev = node;
     }
 
-    void swap(List& x) { Zyx::swap(node, x.node); }
+    void swap(List& other) { Zyx::swap(node, other.node); }
 
 public:
-    void remove(const value_type& val)
+    void remove(const T& val)
     {
         iterator first = begin();
         iterator last = end();
@@ -245,8 +289,8 @@ public:
         }
     }
 
-    template <typename Predicate>
-    void remove_if(Predicate pred)
+    template <typename UnaryPredicate>
+    void remove_if(UnaryPredicate pred)
     {
         iterator first = begin();
         iterator last = end();
@@ -281,6 +325,31 @@ public:
             else
             {
                 first = cur;                 
+            }
+            cur = first;
+        }
+    }
+
+    template <typename BinaryPredicate>
+    void unique(BinaryPredicate pred)
+    {
+        iterator first = begin();
+        iterator last = end();
+        if (first == last)
+        {
+            return;
+        }
+
+        iterator cur = first;
+        while (++cur != last)
+        {
+            if (pred(*first, *cur))
+            {
+                erase(cur);
+            }
+            else
+            {
+                first = cur;
             }
             cur = first;
         }
@@ -358,8 +427,8 @@ public:
 
         /* 
         // another way:		
-        link_type prev_node = node->next;
-        link_type curr_node = node->next->next;
+        list_node* prev_node = node->next;
+        list_node* curr_node = node->next->next;
         while (curr_node != node) 
         {
             prev_node->next = curr_node->next;
@@ -401,23 +470,23 @@ public:
 
         for (int i = 1; i < fill; i++) 
         {
-            counter[i].merge(counter[i-1]);
+            counter[i].merge(counter[i - 1]);
         }
-        swap(counter[fill-1]);
+        swap(counter[fill - 1]);
 	}
 
 private:
-    link_type get_node() { return list_node_allocator::allocate(); }	
-    void put_node(link_type p) { list_node_allocator::deallocate(p); }
+    list_node* get_node() { return list_node_allocator::allocate(); }	
+    void put_node(list_node* p) { list_node_allocator::deallocate(p); }
 
-    link_type create_node(const T& x)
+    list_node* create_node(const T& x)
     {
-        link_type p = get_node();
+        list_node* p = get_node();
         construct(&p->data, x);
         return p;
     }
 
-    void destroy_node(link_type p)
+    void destroy_node(list_node* p)
     {
         destroy(&p->data);
         put_node(p);
@@ -430,16 +499,69 @@ private:
         node->prev = node;
     }
 
-    void default_initialize(size_type n)
+    void fill_assign(size_type n, const T& val)
     {
+        iterator cur = begin();
+        for (; cur != end() && n > 0; ++cur, --n)
+        {
+            *cur = val;
+        }
 
+        if (n > 0)
+        {
+            insert(end(), n, val);
+        }
+        else
+        {
+            erase(cur, end());
+        }
     }
 
-    void fill_initialize(size_type n, const value_type& val)
+    template <typename Integer>
+    void assign_dispatch(Integer n, Integer val, _true_type)
     {
-        while (n--)
+        fill_assign(n, val);
+    }
+
+    template <typename InputIterator>
+    void assign_dispatch(InputIterator first, InputIterator last, _false_type)
+    {
+        iterator cur = begin();
+        for (; cur != end() && first != last; ++cur, ++first)
         {
-            push_back(val);
+            *cur = *first;
+        }
+
+        if (first != last)
+        {
+            insert(end(), first, last);
+        }
+        else
+        {
+            erase(cur, end());
+        }
+    }    
+
+    void fill_insert(iterator pos, size_type n, const T& val)
+    {
+        for (; n > 0; n--)
+        {
+            insert(pos, val);
+        }
+    }
+
+    template <typename Integer>
+    void insert_dispatch(iterator pos, Integer n, Integer val, _true_type)
+    {
+        fill_insert(pos, n, val);
+    }
+
+    template <typename InputIterator>
+    void insert_dispatch(iterator pos, InputIterator first, InputIterator last, _false_type)
+    {
+        for (; first != last; ++first)
+        {
+            insert(pos, *first);
         }
     }
 
@@ -448,14 +570,14 @@ private:
         last.node->prev->next = pos.node;
         first.node->prev->next = last.node;
         pos.node->prev->next = first.node;
-        link_type tmp = pos.node->prev;
+        list_node* tmp = pos.node->prev;
         pos.node->prev = last.node->prev;
         last.node->prev = first.node->prev;
         first.node->prev = tmp;
     }
 
 private:
-    link_type node;
+    list_node* node;
 };
 
 
