@@ -153,6 +153,15 @@ InputIterator next(InputIterator iter,
     return iter;
 }
 
+//----------------------------------【prev() function】--------------------------------------
+
+template <typename BidirectionalIterator>
+BidirectionalIterator prev(BidirectionalIterator iter,
+                           typename iterator_traits<BidirectionalIterator>::difference_type n = 1)
+{
+    advance(iter, -n);
+    return iter;
+}
 
 //-----------------------------【back_insert_iteator class】---------------------------------
 
